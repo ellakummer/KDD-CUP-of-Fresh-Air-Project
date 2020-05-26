@@ -1,10 +1,13 @@
 import numpy as np
 
-A = np.array([1,2,3])
-print(A)
-
-A = np.append(A, np.array([4,5,6,]))
-print(A)
-
-A = np.append(A, [7,5,6])
-print(A)
+#arr = np.empty((0,3), int)
+arr = np.empty((0,3))
+print("Empty array:")
+print(arr)
+arr = np.append(arr, np.array([[10,20,30]]), axis=0)
+arr = np.append(arr, np.array([[40,50,60]]), axis=0)
+arr = np.append(arr, np.array([[40,50,60]]), axis=0)
+arr = np.append(arr, np.array([[40,50,60]]), axis=0)
+print("After adding two new arrays:")
+print(arr)
+print(arr.shape)
