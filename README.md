@@ -12,7 +12,7 @@ https://machinelearningmastery.com/a-tour-of-machine-learning-algorithms/
 pas convaincue :
 
 https://fr.wikipedia.org/wiki/Machine_%C3%A0_vecteurs_de_support
--> pour classes prédéfinies... :( 
+-> pour classes prédéfinies... :( => càd ? ah nevermind
 
 https://en.wikipedia.org/wiki/Recurrent_neural_network
 
@@ -30,19 +30,21 @@ https://fr.wikipedia.org/wiki/R%C3%A9gression_locale
 
 https://machinelearningmastery.com/bagging-and-random-forest-ensemble-algorithms-for-machine-learning/
 -> pour vue générale ? ... partout ils en parlent pour la "météo"
+-> pas mal mais implique la multiplication de données pour meilleures estimation => on a 10M de données (par ville) ... nos pc vont mourir
 
-https://en.wikipedia.org/wiki/Gradient_boosting
+https://en.wikipedia.org/wiki/Gradient_boosting ouais ouais j'ai tout compris tkt
 
-https://fr.wikipedia.org/wiki/R%C3%A9gression_multivari%C3%A9e_par_spline_adaptative
+https://fr.wikipedia.org/wiki/R%C3%A9gression_multivari%C3%A9e_par_spline_adaptative -> c'est pas pour des features indépendantes ? sinon stylé
 
-https://fr.wikipedia.org/wiki/R%C3%A9gularisation_de_Tikhonov
+https://fr.wikipedia.org/wiki/R%C3%A9gularisation_de_Tikhonov 
 
-https://en.wikipedia.org/wiki/Elastic_net_regularization
-https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+https://en.wikipedia.org/wiki/Elastic_net_regularization ouais ouais j'ai tout compris tkt bis
+https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html -> vive sckit
 
-https://en.wikipedia.org/wiki/Least-angle_regression
+https://en.wikipedia.org/wiki/Least-angle_regression -> not bad i think ( if not ( ouais ouais j'ai tout compris tkt) )
 
-https://fr.wikipedia.org/wiki/R%C3%A9seau_bay%C3%A9sien
+https://fr.wikipedia.org/wiki/R%C3%A9seau_bay%C3%A9sien 
+-> "L'intérêt particulier des réseaux bayésiens est de tenir compte simultanément de connaissances a priori d'experts (dans le graphe) et de l'expérience contenue dans les données." => super bien pour le meteo grid et observable non ? problème -> tables de probabilités (base + estimée) de bâtard ...
 
 
 
