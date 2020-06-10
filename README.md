@@ -32,7 +32,9 @@ https://machinelearningmastery.com/bagging-and-random-forest-ensemble-algorithms
 -> pour vue générale ? ... partout ils en parlent pour la "météo"
 -> pas mal mais implique la multiplication de données pour meilleures estimation => on a 10M de données (par ville) ... nos pc vont mourir
 
-https://en.wikipedia.org/wiki/Gradient_boosting ouais ouais j'ai tout compris tkt
+https://en.wikipedia.org/wiki/Gradient_boosting ouais ouais j'ai tout compris tkt -> (je m'en occupe !)
+https://www.youtube.com/watch?v=3CC4N4z3GJc
+https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting
 
 https://fr.wikipedia.org/wiki/R%C3%A9gression_multivari%C3%A9e_par_spline_adaptative -> c'est pas pour des features indépendantes ? sinon stylé
 
@@ -46,7 +48,7 @@ https://en.wikipedia.org/wiki/Least-angle_regression -> not bad i think ( if not
 https://fr.wikipedia.org/wiki/R%C3%A9seau_bay%C3%A9sien 
 -> "L'intérêt particulier des réseaux bayésiens est de tenir compte simultanément de connaissances a priori d'experts (dans le graphe) et de l'expérience contenue dans les données." => super bien pour le meteo grid et observable non ? problème -> tables de probabilités (base + estimée) de bâtard ...
 
-
+https://fr.wikipedia.org/wiki/Mod%C3%A8le_additif_g%C3%A9n%C3%A9ralis%C3%A9 this one !! 
 
 Python librairy : 
 scikit-learn
