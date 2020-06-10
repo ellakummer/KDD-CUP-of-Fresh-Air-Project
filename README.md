@@ -52,3 +52,6 @@ https://fr.wikipedia.org/wiki/Mod%C3%A8le_additif_g%C3%A9n%C3%A9ralis%C3%A9 this
 
 Python librairy : 
 scikit-learn
+
+inspiration ? 
+https://stackoverflow.com/questions/41925157/logisticregression-unknown-label-type-continuous-using-sklearn-in-python

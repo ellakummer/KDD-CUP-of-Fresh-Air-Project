@@ -1,9 +1,16 @@
 import csv
 import numpy as np
-
+# for gradient boosting
 from sklearn.metrics import mean_squared_error
 from sklearn.datasets import make_friedman1
 from sklearn.ensemble import GradientBoostingRegressor
+# for SVM with cross validation
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+from sklearn import svm
+from sklearn.model_selection import cross_val_score
+from sklearn import preprocessing
+from sklearn import utils
 
 # transform into array London_historical_aqi_forecast_stations_20180331
 
@@ -36,7 +43,7 @@ with open('../final_project_data/London_historical_aqi_forecast_stations_2018033
             break
 
 
-print("----------- TESTS ------------")
+print("----------- TESTS DATAS ------------")
 
 print("COMBINE : ")
 # https://numpy.org/doc/stable/user/basics.rec.html
@@ -68,13 +75,12 @@ print(records[-1])
 print("test sum :")
 print(records[7][2] + records[9][2])
 
-print("----------- END TEST ------------")
+print("----------- END TEST DATAS ------------")
 
 '''
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 add second datas : London_historical_aqi_other_stations_20180331
 '''
-
-print("----------- START TESTS Gradient Tree Boosting ------------")
 
 X_train, X_test = data_predict_x[:200], data_predict_x[200:] # we use PM2.5 and N02
 y_train, y_test = column4[:200], column4[200:] # we predict PM10
@@ -85,8 +91,13 @@ print(X_test.shape)
 print(y_train.shape)
 print(y_test.shape)
 
-#TO FIT : n_estimators, learning rate, AND max_depth
 
+print("----------- START TESTS : Gradient Tree Boosting ------------")
+'''
+ON SEPARERA ON FONCTION PLUS TARD
+'''
+#TO FIT : n_estimators, learning rate, AND max_depth
+'''
 min_error = 1000
 
 n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600])
@@ -116,7 +127,34 @@ print(best_depth)
 est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
 pred = est.predict(X_test)
 '''
+'''
 for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
 '''
+print("----------- END TESTS Gradient Tree Boosting ------------")
+
+print("----------- START TESTS : SVM / cross validation ------------")
+# https://scikit-learn.org/stable/modules/cross_validation.html
+# https://scikit-learn.org/stable/modules/svm.html
+#clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
+#clf.score(X_test, y_test)
+
+lab_enc = preprocessing.LabelEncoder()
+y_train_encoded = lab_enc.fit_transform(column4)
+
+clf = svm.SVC(kernel='linear', C=1)
+scores = cross_val_score(clf, data_predict_x, y_train_encoded, cv=2)
+print("scores : ")
+print(scores)
+print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+
+print("----------- END TESTS SVM / Cross validation ------------")
+
+print("----------- START TESTS : Random Forest ------------")
+# https://machinelearningmastery.com/random-forest-ensemble-in-python/
+print("----------- END TESTS Random Forest ------------")
+
+print("----------- START TEST : GAM ------------")
+# https://medium.com/just-another-data-scientist/building-interpretable-models-with-generalized-additive-models-in-python-c4404eaf5515
+print("----------- END TESTS GAM ------------")
