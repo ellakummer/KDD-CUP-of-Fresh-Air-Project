@@ -1,5 +1,14 @@
 import csv
 import numpy as np
+# for random forest
+import sklearn
+from sklearn.datasets import make_regression
+from numpy import mean
+from numpy import std
+from sklearn.datasets import make_regression
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RepeatedKFold
+from sklearn.ensemble import RandomForestRegressor
 # for gradient boosting
 from sklearn.metrics import mean_squared_error
 from sklearn.datasets import make_friedman1
@@ -11,6 +20,10 @@ from sklearn import svm
 from sklearn.model_selection import cross_val_score
 from sklearn import preprocessing
 from sklearn import utils
+# for GAM
+# pip3 install pygam
+from pygam import GAM, s, f
+from pygam import PoissonGAM
 
 # transform into array London_historical_aqi_forecast_stations_20180331
 
@@ -93,6 +106,7 @@ print(y_test.shape)
 
 
 print("----------- START TESTS : Gradient Tree Boosting ------------")
+# https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting
 '''
 ON SEPARERA ON FONCTION PLUS TARD
 '''
@@ -135,11 +149,12 @@ for i in range(10) :
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
 print("----------- START TESTS : SVM / cross validation ------------")
+# PAS FIFOU HEIN
 # https://scikit-learn.org/stable/modules/cross_validation.html
 # https://scikit-learn.org/stable/modules/svm.html
 #clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
 #clf.score(X_test, y_test)
-
+'''
 lab_enc = preprocessing.LabelEncoder()
 y_train_encoded = lab_enc.fit_transform(column4)
 
@@ -148,13 +163,110 @@ scores = cross_val_score(clf, data_predict_x, y_train_encoded, cv=2)
 print("scores : ")
 print(scores)
 print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-
+'''
 print("----------- END TESTS SVM / Cross validation ------------")
 
 print("----------- START TESTS : Random Forest ------------")
 # https://machinelearningmastery.com/random-forest-ensemble-in-python/
+'''
+we will evaluate the model using repeated k-fold cross-validation,
+with three repeats and 10 folds. We will report the mean absolute error (MAE)
+of the model across all repeats and folds. The scikit-learn library makes the
+MAE negative so that it is maximized instead of minimized.
+This means that larger negative MAE are better and a perfect model has a MAE of 0.
+'''
+'''
+max_score = 0
+X, y = data_predict_x, column4
+# TO SET PARAMETERS
+max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
+max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
+n_estimator = np.array([10,50,100, 200, 300, 400, 500]) # sdet tp 100 by default
+max_depth = np.array([None,1,2,3,4,5,6,7])
+
+for max_samp in max_sample :
+    for max_feat in max_feature :
+        for max_dep in max_depth :
+            for n in n_estimator :
+                model = RandomForestRegressor(max_samples = max_samp, max_features = max_feat, n_estimators = n, max_depth = max_dep)
+                cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+                n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+                if mean(n_scores) < max_score :
+                    max_score = mean(n_scores)
+                    best_n_est = n
+                    best_max_sample = max_samp
+                    best_max_feature = max_feat
+                    best_max_depth = max_dep
+
+print("best n_estimator : ")
+print(best_n_est)
+print("best max_feature : ")
+print(best_max_feature)
+print("best max_sample : ")
+print(best_max_sample)
+print("best max_depth : ")
+print(best_max_depth)
+
+print("results cross-validation error w/ best parameters : ")
+X, y = data_predict_x, column4
+model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
+cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+print('MAE: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
+
+print("prediciton...")
+model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
+model.fit(X_train, y_train)
+y_test_pred = model.predict(X_test)
+mean_sq_err = np.mean(y_test_pred == y_test)
+print("Mean squared error : ")
+print(mean_sq_err)
+print('Prediction[0]: %d' % yhat[0])
+print('Should predict : %d' %y_test[0])
+print('Prediction[1]: %d' % yhat[1])
+print('Should predict : %d' %y_test[1])
+'''
+
 print("----------- END TESTS Random Forest ------------")
 
-print("----------- START TEST : GAM ------------")
+print("----------- START TEST : GAM (generalized additive model) ------------")
 # https://medium.com/just-another-data-scientist/building-interpretable-models-with-generalized-additive-models-in-python-c4404eaf5515
+# The common models are LinearGAM, LogisticGAM, PoissonGAM, GammaGAM, InvGuss.
+'''
+gam = GAM(s(0, n_splines=5) + s(1) + f(2) + s(3), distribution=’gamma’, link=’log’) # specify the link function, the functional form and the distribution
+gam2 = PoissonGAM(s(0, n_splines=5) + s(1) + f(2) + s(3))
+'''
+
+# OMG DES SAUVEURS :
+'''
+Find the best model requires the tuning of several key parameters including
+n_splines, lam, and constraints.
+Among them, lam is of great importance to the performance of GAMs.
+It controls the strength of the regularization penalty on each term.
+
+yGAM built a grid search function that build a grid to search over multiple lam
+values so that the model with the lowest generalized cross-validation (GCV) score.
+'''
+
+# prepare datas :
+redwine_X = redwine.drop(['quality'], axis=1).values
+redwine_y = redwine['quality']
+# Build the model via gridsearch :
+lams = np.random.rand(100, 11)
+lams = lams * 11 - 3
+lams = np.exp(lams)
+print(lams.shape)
+gam = LinearGAM(n_splines=10).gridsearch(redwine_X, redwine_y, lam=lams)
+# Partial dependency plots :
+titles = redwine.columns[0:11]
+plt.figure()
+fig, axs = plt.subplots(1,11,figsize=(40, 8))
+for i, ax in enumerate(axs):
+    XX = gam.generate_X_grid(term=i)
+    ax.plot(XX[:, i], gam.partial_dependence(term=i, X=XX))
+    ax.plot(XX[:, i], gam.partial_dependence(term=i, X=XX,   width=.95)[1], c='r', ls='--')
+    if i == 0:
+        ax.set_ylim(-30,30)
+    ax.set_title(titles[i])
+
 print("----------- END TESTS GAM ------------")
