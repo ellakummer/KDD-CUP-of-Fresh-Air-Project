@@ -13,9 +13,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.datasets import make_friedman1
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import confusion_matrix, classification_report
 
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
 # for SVM with cross validation
 from sklearn.model_selection import train_test_split
@@ -29,19 +28,46 @@ from pygam import GAM, s, f
 from pygam import PoissonGAM
 from pygam import LogisticGAM
 from pygam import LinearGAM
-# tests :
-from sklearn.datasets import load_boston
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
-# not sure :
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import log_loss
+# for Multiclass Neural Network
+
+from keras.callbacks import ModelCheckpoint
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten
+import seaborn as sb
+import warnings
+warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+#from xgboost import XGBRegressor
+# tests
+from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
+# plots
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+
 
 # https://medium.com/mongolian-data-stories/ulaanbaatar-air-pollution-part-1-35e17c83f70b (ici plus discret mdr)
+# https://medium.com/mongolian-data-stories/part-3-the-model-b2fb9a25a07c
+# https://github.com/robertritz/Ulaanbaatar-PM2.5-Prediction/blob/master/Classification%20Model/Ulaanbaatar%20PM2.5%20Prediction%20-%20Classification.ipynb
 
 # transform into array London_historical_aqi_forecast_stations_20180331
+
+# If the wind speed is less than 0.5m/s (nearly no wind), the value of the wind direction is 999017.
+# -> put to 0
+
+# TO PUT NAN TO AVERAGE COLUMN :
+# https://stackoverflow.com/questions/18689235/numpy-array-replace-nan-values-with-average-of-columns
+
+# ALSO :
+# see how to VISUALIZE the datas
+# e.g. plot PMs per month ( overall visualisation, avoir une idée du truc - > dans intro rapport ? )
+# e.g. afficher PMs en fonction de chaque autre donnée qu'on a (un plot par donnée externe)
+
+# MODELS :
+# GradientBoostingRegressor, svm.SVC, RandomForestRegressor, LogisticGAM
 
 column1 = np.empty((0,1))
 column2 = np.empty((0,1))
@@ -134,6 +160,10 @@ n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 
+n_est = np.array([1, 2, 3])
+learning_rates = np.array([0.01, 0.02, 0.03])
+max_depths = np.array([1,2])
+
 for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
@@ -157,6 +187,11 @@ print("with max_depth : ")
 print(best_depth)
 est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
 pred = est.predict(X_test)
+# Calculate probabilities
+#est_prob = est.predict_proba(X_test)
+# Calculate confusion matrix
+#confusion_est = confusion_matrix(y_test,pred)
+#print(confusion_est)
 '''
 '''
 for i in range(10) :
@@ -166,6 +201,7 @@ for i in range(10) :
 
 # OR :
 '''
+# https://www.datacareer.ch/blog/parameter-tuning-in-gradient-boosting-gbm-with-python/
 p_test2 = {'max_depth':[2,3,4,5,6,7] }
 p_test3 = {'max_depth':[2,3,4,5,6,7], 'learning_rate':[0.15,0.1,0.05,0.01,0.005,0.001], 'n_estimators':[100,250,500,750,1000,1250,1500,1750]}
 
@@ -246,7 +282,6 @@ print("prediciton...")
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
 model.fit(X_train, y_train)
 y_test_pred = model.predict(X_test)
-# SHOULD MEAN SQUARED ERROR !!!
 mean_sq_err = mean_squared_error(y_test_pred, y_test)
 print("Mean squared error : ")
 print(mean_sq_err)
@@ -330,10 +365,21 @@ plt.show()
 
 print("----------- END TESTS GAM ------------")
 
+print("----------- START TESTS Multiclass Neural Network  ------------")
+'''
+C_mat = data_predict_x.corr()
+fig = plt.figure(figsize = (15,15))
+'''3
+'''
+for i in range(10) :
+    print("test : ", y_test[i])
+    print("pred = ", pred[i])
 '''
 
+print("----------- END TESTS Multiclass Neural Network  ------------")
+
+
+'''
 TODO :
 - cross validation everywhere
-- missing values -> ok panda, numpy ?  --- > numpy -> panda -> numpy ?
-
 '''
