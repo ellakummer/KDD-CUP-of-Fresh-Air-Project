@@ -13,6 +13,10 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.datasets import make_friedman1
 from sklearn.ensemble import GradientBoostingRegressor
+
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV
 # for SVM with cross validation
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
@@ -20,10 +24,22 @@ from sklearn import svm
 from sklearn.model_selection import cross_val_score
 from sklearn import preprocessing
 from sklearn import utils
-# for GAM
-# pip3 install pygam
+# for GAM (pip3 install pygam)
 from pygam import GAM, s, f
 from pygam import PoissonGAM
+from pygam import LogisticGAM
+from pygam import LinearGAM
+# tests :
+from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+# not sure :
+import pandas as pd
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import log_loss
+
+# https://medium.com/mongolian-data-stories/ulaanbaatar-air-pollution-part-1-35e17c83f70b (ici plus discret mdr)
 
 # transform into array London_historical_aqi_forecast_stations_20180331
 
@@ -114,7 +130,7 @@ ON SEPARERA ON FONCTION PLUS TARD
 '''
 min_error = 1000
 
-n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600])
+n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600,750,1000,1250,1500,1750])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 
@@ -122,6 +138,7 @@ for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
             est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train, y_train)
+            # make cross validation error
             error = mean_squared_error(y_test, est.predict(X_test))
             if error < min_error :
                 min_error = error
@@ -145,6 +162,17 @@ pred = est.predict(X_test)
 for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
+'''
+
+# OR :
+'''
+p_test2 = {'max_depth':[2,3,4,5,6,7] }
+p_test3 = {'max_depth':[2,3,4,5,6,7], 'learning_rate':[0.15,0.1,0.05,0.01,0.005,0.001], 'n_estimators':[100,250,500,750,1000,1250,1500,1750]}
+
+tuning = GridSearchCV(estimator =GradientBoostingRegressor(random_state=0, loss = 'ls'),
+            param_grid = p_test3, scoring='neg_mean_squared_error', cv=5)
+tuning.fit(X_train,y_train)
+print(tuning.best_params_, tuning.best_score_)
 '''
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
@@ -218,7 +246,8 @@ print("prediciton...")
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
 model.fit(X_train, y_train)
 y_test_pred = model.predict(X_test)
-mean_sq_err = np.mean(y_test_pred == y_test)
+# SHOULD MEAN SQUARED ERROR !!!
+mean_sq_err = mean_squared_error(y_test_pred, y_test)
 print("Mean squared error : ")
 print(mean_sq_err)
 print('Prediction[0]: %d' % yhat[0])
@@ -232,10 +261,6 @@ print("----------- END TESTS Random Forest ------------")
 print("----------- START TEST : GAM (generalized additive model) ------------")
 # https://medium.com/just-another-data-scientist/building-interpretable-models-with-generalized-additive-models-in-python-c4404eaf5515
 # The common models are LinearGAM, LogisticGAM, PoissonGAM, GammaGAM, InvGuss.
-'''
-gam = GAM(s(0, n_splines=5) + s(1) + f(2) + s(3), distribution=’gamma’, link=’log’) # specify the link function, the functional form and the distribution
-gam2 = PoissonGAM(s(0, n_splines=5) + s(1) + f(2) + s(3))
-'''
 
 # OMG DES SAUVEURS :
 '''
@@ -246,27 +271,69 @@ It controls the strength of the regularization penalty on each term.
 
 yGAM built a grid search function that build a grid to search over multiple lam
 values so that the model with the lowest generalized cross-validation (GCV) score.
+
+n_splines refers to the number of splines to use in each of the smooth function that is going to be fitted.
+
+lam is the penalization term that is multiplied to the second derivative in the overall objective function.
+
+constraints is a list of constraints that allows the user to specify whether a
+function should have a monotonically constraint. This needs to be a string
+in [‘convex’, ‘concave’, ‘monotonic_inc’, ‘monotonic_dec’,’circular’, ‘none’]
 '''
 
-# prepare datas :
-redwine_X = redwine.drop(['quality'], axis=1).values
-redwine_y = redwine['quality']
-# Build the model via gridsearch :
-lams = np.random.rand(100, 11)
-lams = lams * 11 - 3
-lams = np.exp(lams)
-print(lams.shape)
-gam = LinearGAM(n_splines=10).gridsearch(redwine_X, redwine_y, lam=lams)
-# Partial dependency plots :
-titles = redwine.columns[0:11]
-plt.figure()
-fig, axs = plt.subplots(1,11,figsize=(40, 8))
+'''
+boston = load_boston()
+df = pd.DataFrame(boston.data, columns=boston.feature_names)
+target_df = pd.Series(boston.target)
+df.head()
+
+X = df.fillna(df.mean()) # combined X = df, X = X.fillna(X.mean())
+y = target_df.fillna(target_df.mean())
+X = X.to_numpy()
+y = y.to_numpy()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+# set model : OVER CONSTRAINT, LAM, SPLINES
+gam = LinearGAM(n_splines=10).gridsearch(X_train, y_train)
+#gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
+#gam.summary()
+
+#prediction :
+predictions = gam.predict(X_test)
+print("Mean squared error: {} over {} samples".format(mean_squared_error(y_test, predictions), y.shape[0]))
+
+print("y test : ")
+print(y_test)
+print("predictions : ")
+print(predictions)
+'''
+
+#y_test=y_test.astype('int')
+#predictions=predictions.astype('int')
+#print("Log Loss: {} ".format(log_loss(y_test, predictions)))
+
+'''
+XX = gam.generate_X_grid(term=1)
+plt.rcParams['figure.figsize'] = (28, 8)
+fig, axs = plt.subplots(1, len(boston.feature_names[0:6]))
+titles = boston.feature_names
 for i, ax in enumerate(axs):
-    XX = gam.generate_X_grid(term=i)
-    ax.plot(XX[:, i], gam.partial_dependence(term=i, X=XX))
-    ax.plot(XX[:, i], gam.partial_dependence(term=i, X=XX,   width=.95)[1], c='r', ls='--')
-    if i == 0:
-        ax.set_ylim(-30,30)
-    ax.set_title(titles[i])
+    #pdep, confi = gam.partial_dependence(XX, feature=i+1, width=.95)
+    pdep, confi = gam.partial_dependence(XX, width=.95)
+    ax.plot(XX[:, i], pdep)
+    ax.plot(XX[:, i], confi[0][:, 0], c='grey', ls='--')
+    ax.plot(XX[:, i], confi[0][:, 1], c='grey', ls='--')
+    ax.set_title(titles[i],fontsize=26)
+plt.show()
+'''
 
 print("----------- END TESTS GAM ------------")
+
+'''
+
+TODO :
+- cross validation everywhere
+- missing values -> ok panda, numpy ?  --- > numpy -> panda -> numpy ?
+
+'''
