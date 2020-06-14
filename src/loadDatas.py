@@ -191,13 +191,25 @@ print(bl0_aqi_forecast)
 #print(bl0_aqi_forecast.iloc[[3]])
 
 #bl0_grid_stations : id YYY --> id london_grid_XX
+longitude_bl0 = float(f"{bl0_airQuality_stations['Longitude'].values[0]:.1f}")
+latitude_bl0 = float(f"{bl0_airQuality_stations['Latitude'].values[0]:.1f}")
 '''
-bl0_grid_stations = bl0_grid_stations.loc[bl0_grid_stations['id']=='BL0',:]
+print("longitude bl0 : ")
+print(longitude_bl0)
+print("latitude bl0 : ")
+print(latitude_bl0)
+print(type(longitude_bl0))
+print(type(latitude_bl0))
+'''
+bl0_grid_stations = bl0_grid_stations.loc[bl0_grid_stations['longitude']=='longitude_bl0','latitude' == 'latitude_bl0']
 print("bl0_grid_stations : ")
 print(bl0_grid_stations)
-'''
+
 
 #bl0_meo_grid <- id london_grid_XX
+
+print("-------------------------- CREATE TESTS DATAS --------------------------")
+
 
 
 print("-------------------------- CONVERT TO NUMPY --------------------------")

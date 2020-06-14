@@ -34,3 +34,13 @@ print(df.loc['viper'])
 print(df2)
 DD = df2.loc[df2['shield']=='A',:]
 print(DD)
+
+pi = 3.14159265359
+text = float(f"{pi:.1f}")
+'''
+formatted_pi = float(text)
+print(formatted_pi)
+'''
+print(text)
+print(type(text))
+print(type(pi))
