@@ -57,9 +57,6 @@ from mpl_toolkits import mplot3d
 # If the wind speed is less than 0.5m/s (nearly no wind), the value of the wind direction is 999017.
 # -> put to 0
 
-# TO PUT NAN TO AVERAGE COLUMN :
-# https://stackoverflow.com/questions/18689235/numpy-array-replace-nan-values-with-average-of-columns
-
 # ALSO :
 # see how to VISUALIZE the datas
 # e.g. plot PMs per month ( overall visualisation, avoir une idée du truc - > dans intro rapport ? )
@@ -71,7 +68,7 @@ from mpl_toolkits import mplot3d
 
 # ------- LOAD array London_historical_aqi_forecast_stations_20180331 ------
 
-print("LOAD London_historical_aqi_forecast_stations_20180331")
+print(" -------------------- LOAD London_historical_aqi_forecast_stations_20180331")
 aqi_forecast = pd.read_csv('../final_project_data/London_historical_aqi_forecast_stations_20180331.csv')
 
 aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
@@ -94,8 +91,6 @@ plt.ylabel('PM2.5 Level')
 plt.title('PM2.5  from 2018/3/28 14:00 to 2018/3/29 0:00 , before interpolation')
 plt.show()
 '''
-print(aqi_forecast.iloc[[3]])
-
 
 #aqi_forecast = aqi_forecast.to_numpy()
 #print(aqi_forecast)
@@ -113,7 +108,7 @@ plt.show()
 '''
 print("")
 # ------- LOAD London_historical_aqi_other_stations_20180331 ------
-print("LOAD London_historical_aqi_other_stations_20180331")
+print(" -------------------- LOAD London_historical_aqi_other_stations_20180331")
 aqi_other = pd.read_csv('../final_project_data/London_historical_aqi_other_stations_20180331.csv')
 '''
 print("aqi_other lines : ")
@@ -140,34 +135,37 @@ print(aqi_other[7][3] + aqi_other[9][3])
 '''
 
 print("")
-'''
 #------- LOAD London_AirQuality_Stations ------
-print("LOAD London_AirQuality_Stations")
+print("-------------------- LOAD London_AirQuality_Stations")
 airQuality_stations = pd.read_csv('../final_project_data/London_AirQuality_Stations.csv')
 
 print("test shape airQuality_stations: ")
 print(airQuality_stations.shape)
 
-C_mat_airQuality_stations= airQuality_stations.corr()
-print(C_mat_airQuality_stations)
 print(airQuality_stations)
 
 print("")
+airQuality_stations = airQuality_stations.to_numpy()
+print("7th  elements : ")
+print(airQuality_stations[7])
+
+print("")
 # ------- LOAD London_grid_weather_station ------
-print("LOAD London_grid_weather_station")
+print(" -------------------- LOAD London_grid_weather_station")
 grid_stations = pd.read_csv('../final_project_data/London_grid_weather_station.csv')
 
 print("test shape grid_stations: ")
 print(grid_stations.shape)
 
-C_mat_grid_stations = grid_stations.corr()
-print(C_mat_grid_stations)
 print(grid_stations)
 
 print("")
 # ------- LOAD London_historical_meo_grid ------
-print("LOAD London_historical_meo_grid")
+print(" -------------------- LOAD London_historical_meo_grid")
 meo_grid = pd.read_csv('../../London_historical_meo_grid.csv')
+meo_grid = meo_grid.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+meo_grid = meo_grid.fillna(meo_grid.mean())
+
 
 print("test shape meo_grid: ")
 print(aqi_forecast.shape)
@@ -175,9 +173,8 @@ print(aqi_forecast.shape)
 C_mat_meo_grid = meo_grid.corr()
 print(C_mat_meo_grid)
 print(meo_grid)
-'''
 
-''' -------------------------- CONVERT TO NUMPY ----------------------------'''
+print("-------------------------- CONVERT TO NUMPY --------------------------")
 
 aqi_forecast = aqi_forecast.to_numpy()
 # select column 3 and 5 (PM2.5 and O3)
