@@ -1,4 +1,4 @@
-,api_data,need_prediction,historical_data,Latitude,Longitude,SiteType,SiteName
+id,api_data,need_prediction,historical_data,Latitude,Longitude,SiteType,SiteName
 BX9,TRUE,,TRUE,51.46598327,0.184877127,Suburban,Bexley - Slade Green FDMS
 BX1,TRUE,,TRUE,51.46598327,0.184877127,Suburban,Bexley - Slade Green
 BL0,TRUE,TRUE,TRUE,51.522287,-0.125848,Urban Background,Camden - Bloomsbury

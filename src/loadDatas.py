@@ -143,12 +143,12 @@ print("test shape airQuality_stations: ")
 print(airQuality_stations.shape)
 
 print(airQuality_stations)
-
+'''
 print("")
 airQuality_stations = airQuality_stations.to_numpy()
 print("7th  elements : ")
 print(airQuality_stations[7])
-
+'''
 print("")
 # ------- LOAD London_grid_weather_station ------
 print(" -------------------- LOAD London_grid_weather_station")
@@ -163,16 +163,42 @@ print("")
 # ------- LOAD London_historical_meo_grid ------
 print(" -------------------- LOAD London_historical_meo_grid")
 meo_grid = pd.read_csv('../../London_historical_meo_grid.csv')
-meo_grid = meo_grid.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
-meo_grid = meo_grid.fillna(meo_grid.mean())
-
+# TAKES A LOT OF TIME :
+#meo_grid = meo_grid.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+#meo_grid = meo_grid.fillna(meo_grid.mean())
 
 print("test shape meo_grid: ")
-print(aqi_forecast.shape)
+print(meo_grid.shape)
 
 C_mat_meo_grid = meo_grid.corr()
 print(C_mat_meo_grid)
 print(meo_grid)
+
+print("-------------------------- MERGE DATAS  --------------------------")
+# so we have : aqi_forecast, aqi_other, airQuality_stations, grid_stations, meo_grid
+# TRY TAKE FOR ONE STATION : BL0
+# BASIC INFOS (IDs)
+
+# bl0_airQuality_stations ->  id YYY :
+bl0_airQuality_stations = airQuality_stations.loc[airQuality_stations['id']=='BL0',:]
+print("bl0_airQuality_stations : ")
+print(bl0_airQuality_stations)
+
+#bl0_aqi_forecast <- id YYY
+bl0_aqi_forecast = aqi_forecast.loc[aqi_forecast['station_id']=='BL0',:]
+print("bl0_aqi_forecast : ")
+print(bl0_aqi_forecast)
+#print(bl0_aqi_forecast.iloc[[3]])
+
+#bl0_grid_stations : id YYY --> id london_grid_XX
+'''
+bl0_grid_stations = bl0_grid_stations.loc[bl0_grid_stations['id']=='BL0',:]
+print("bl0_grid_stations : ")
+print(bl0_grid_stations)
+'''
+
+#bl0_meo_grid <- id london_grid_XX
+
 
 print("-------------------------- CONVERT TO NUMPY --------------------------")
 

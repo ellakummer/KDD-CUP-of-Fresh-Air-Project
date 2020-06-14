@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+import random
 
 # ----------- TEST JOINING DATA FRAMES -----------------
 
@@ -16,3 +16,21 @@ print(df1)
 print(df4)
 print(s1)
 print(result)
+
+partial_results = result.iloc[0:2,:]
+print("partial results : ")
+print(partial_results)
+
+df = pd.DataFrame([[2, 3], [5, 6], [8, 9]],
+     index=['cobra', 'viper', 'sidewinder'],
+     columns=['max_speed', 'shield'])
+
+df2 = pd.DataFrame([[2, 'A'], [5, 'B'], [8, 'C']],
+     columns=['max_speed', 'shield'])
+
+print(df)
+print(df.loc['viper'])
+
+print(df2)
+DD = df2.loc[df2['shield']=='A',:]
+print(DD)
