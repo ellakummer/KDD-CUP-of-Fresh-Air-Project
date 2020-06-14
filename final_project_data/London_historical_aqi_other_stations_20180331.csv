@@ -1,4 +1,4 @@
-Station_ID,MeasurementDateGMT,PM2.5 (ug-m3),PM10 (ug-m3),NO2 (ug-m3)
+Station_ID,utc_time,PM2.5 (ug-m3),PM10 (ug-m3),NO2 (ug-m3)
 LH0,2017-1-1 00:00:00,30.2,34.6,15.9
 LH0,2017-1-1 01:00:00,25.4,29.2,11.8
 LH0,2017-1-1 02:00:00,24.7,28.1,11.6

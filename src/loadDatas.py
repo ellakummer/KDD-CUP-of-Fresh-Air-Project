@@ -215,7 +215,8 @@ print("MERGE")
 
 
 print("-------------------------- CREATE TESTS DATAS --------------------------")
-
+# X to predict : temperature,pressure,humidity,wind_direction,wind_speed/kph
+# y to predict : PM2.5 (ug-m3) | PM10 (ug-m3)|  NO2 (ug-m3)
 '''
 x = aqi_forecast['MeasurementDateGMT']
 y = aqi_forecast['PM2.5 (ug/m3)']
