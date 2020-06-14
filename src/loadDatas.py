@@ -180,9 +180,9 @@ print("-------------------------- MERGE DATAS  --------------------------")
 # BASIC INFOS (IDs)
 
 # bl0_airQuality_stations ->  id YYY :
-bl0_airQuality_stations = airQuality_stations.loc[airQuality_stations['id']=='BL0',:]
-print("bl0_airQuality_stations : ")
-print(bl0_airQuality_stations)
+bl0_airQuality_station = airQuality_stations.loc[airQuality_stations['id']=='BL0',:]
+print("bl0_airQuality_station id: ")
+print(bl0_airQuality_station)
 
 #bl0_aqi_forecast <- id YYY
 bl0_aqi_forecast = aqi_forecast.loc[aqi_forecast['station_id']=='BL0',:]
@@ -191,34 +191,50 @@ print(bl0_aqi_forecast)
 #print(bl0_aqi_forecast.iloc[[3]])
 
 #bl0_grid_stations : id YYY --> id london_grid_XX
-longitude_bl0 = float(f"{bl0_airQuality_stations['Longitude'].values[0]:.1f}")
-latitude_bl0 = float(f"{bl0_airQuality_stations['Latitude'].values[0]:.1f}")
-'''
+longitude_bl0 = float(f"{bl0_airQuality_station['Longitude'].values[0]:.1f}")
+latitude_bl0 = float(f"{bl0_airQuality_station['Latitude'].values[0]:.1f}")
 print("longitude bl0 : ")
 print(longitude_bl0)
 print("latitude bl0 : ")
 print(latitude_bl0)
-print(type(longitude_bl0))
-print(type(latitude_bl0))
-'''
-bl0_grid_stations = bl0_grid_stations.loc[bl0_grid_stations['longitude']=='longitude_bl0','latitude' == 'latitude_bl0']
-print("bl0_grid_stations : ")
-print(bl0_grid_stations)
+#print(type(longitude_bl0))
+#print(type(latitude_bl0))
+
+bl0_grid_station = grid_stations.loc[grid_stations['longitude']==longitude_bl0,:].loc[grid_stations['latitude']==latitude_bl0,:]['stationName'].values[0]
+print("bl0_grid_station id : ")
+print(bl0_grid_station)
 
 
 #bl0_meo_grid <- id london_grid_XX
+bl0_meo_grid = meo_grid.loc[meo_grid['stationName']==bl0_grid_station,:]
+print("bl0_meo_grid: ")
+print(bl0_meo_grid)
+
+print("MERGE")
+#bl0_merge =
+
 
 print("-------------------------- CREATE TESTS DATAS --------------------------")
 
-
+'''
+x = aqi_forecast['MeasurementDateGMT']
+y = aqi_forecast['PM2.5 (ug/m3)']
+x = x[141602:141612]
+y = y[141602:141612]
+plt.plot(x,y)
+plt.xlabel('MeasurementDateGMT')
+plt.ylabel('PM2.5 Level')
+plt.title('PM2.5  from 2018/3/28 14:00 to 2018/3/29 0:00 , before interpolation')
+plt.show()
+'''
 
 print("-------------------------- CONVERT TO NUMPY --------------------------")
 
 aqi_forecast = aqi_forecast.to_numpy()
 # select column 3 and 5 (PM2.5 and O3)
-data_predict_x_aqi_forecast = aqi_forecast[:, [3, 5]]
+data_predict_x_aqi_forecast = aqi_forecast[:, [2, 4]]
 # select column 4 : PM10
-data_predict_y_aqi_forecast = aqi_forecast[:, 4]
+data_predict_y_aqi_forecast = aqi_forecast[:, 3]
 
 print("TEST NUMPY DATAS (aqi forecast) : ")
 print(data_predict_x_aqi_forecast)
