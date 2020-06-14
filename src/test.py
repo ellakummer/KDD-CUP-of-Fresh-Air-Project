@@ -2,26 +2,17 @@ import numpy as np
 import pandas as pd
 
 
-#arr = np.empty((0,3), int)
-arr = np.empty((0,3))
-print("Empty array:")
-print(arr)
-arr = np.append(arr, np.array([[10,20,30]]), axis=0)
-arr = np.append(arr, np.array([[40,50,60]]), axis=0)
-arr = np.append(arr, np.array([[40,50,60]]), axis=0)
-arr = np.append(arr, np.array([[40,50,60]]), axis=0)
-print("After adding two new arrays:")
-print(arr)
-print(arr.shape)
+# ----------- TEST JOINING DATA FRAMES -----------------
 
-# ----------- TEST PANDAS FILLING MISSING DATAS -----------------
+#df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],'B': ['B0', 'B1', 'B2', 'B3'],'C': ['C0', 'C1', 'C2', 'C3'],'D': ['D0', 'D1', 'D2', 'D3']},index=[0, 1, 2, 3])
+#df4 = pd.DataFrame({'B': ['B2', 'B3', 'B6', 'B7'],'D': ['D2', 'D3', 'D6', 'D7'],'F': ['F2', 'F3', 'F6', 'F7']}, index=[2, 3, 6, 7])
+s1 = pd.Series(['X0', 'X1', 'X2', 'X3'], name='X')
+df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],'B': ['B0', 'B1', 'B2', 'B3'],'C': ['C0', 'C1', 'C2', 'C3'],'D': ['D0', 'D1', 'D2', 'D3']})
+df4 = pd.DataFrame({'B': ['B2', 'B3', 'B6', 'B7'],'D': ['D2', 'D3', 'D6', 'D7'],'F': ['F2', 'F3', 'F6', 'F7']})
 
-dff = pd.DataFrame(np.random.randn(10, 3), columns=list('ABC'))
+result = pd.concat([df4, s1], axis=1)
 
-dff.iloc[3:5, 0] = np.nan
-dff.iloc[4:6, 1] = np.nan
-dff.iloc[5:8, 2] = np.nan
-print(dff)
-# The use case of this is to fill a DataFrame with the mean of that column.
-dff = dff.fillna(dff.mean())
-print(dff)
+print(df1)
+print(df4)
+print(s1)
+print(result)

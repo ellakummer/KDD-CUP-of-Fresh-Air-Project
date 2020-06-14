@@ -32,7 +32,7 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import log_loss
 # for Multiclass Neural Network
-
+'''
 from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
@@ -41,6 +41,7 @@ import warnings
 warnings.filterwarnings('ignore')
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 #from xgboost import XGBRegressor
+'''
 # tests
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
@@ -369,7 +370,7 @@ print("----------- START TESTS Multiclass Neural Network  ------------")
 '''
 C_mat = data_predict_x.corr()
 fig = plt.figure(figsize = (15,15))
-'''3
+'''
 '''
 for i in range(10) :
     print("test : ", y_test[i])
