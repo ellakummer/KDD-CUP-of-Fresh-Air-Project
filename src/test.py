@@ -9,6 +9,7 @@ import random
 s1 = pd.Series(['X0', 'X1', 'X2', 'X3'], name='X')
 df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],'B': ['B0', 'B1', 'B2', 'B3'],'C': ['C0', 'C1', 'C2', 'C3'],'D': ['D0', 'D1', 'D2', 'D3']})
 df4 = pd.DataFrame({'B': ['B2', 'B3', 'B6', 'B7'],'D': ['D2', 'D3', 'D6', 'D7'],'F': ['F2', 'F3', 'F6', 'F7']})
+df3 = pd.DataFrame({'F': ['F2', 'F3', 'F6', 'F7'],'E': ['E2', 'E3', 'E6', 'E7'],'D': ['D1', 'D2', 'D3', 'D4']})
 
 result = pd.concat([df4, s1], axis=1)
 
@@ -46,7 +47,9 @@ print(type(text))
 print(type(pi))
 
 print("test joins : ")
-result = df1.append(df4, sort=False)
+print(df1.columns)
+print(df3.columns)
+result = pd.merge(left=df1, right=df3, left_on='D', right_on='D')
 print(df1)
-print(df4)
+print(df3)
 print(result)

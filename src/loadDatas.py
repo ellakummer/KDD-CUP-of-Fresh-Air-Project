@@ -211,23 +211,24 @@ print("bl0_meo_grid: ")
 print(bl0_meo_grid)
 
 print("MERGE")
-#bl0_merge =
-
+'''
+print(bl0_aqi_forecast.columns)
+print(bl0_meo_grid.columns)
+'''
+bl0_merge =pd.merge(left=bl0_aqi_forecast, right=bl0_meo_grid, left_on='utc_time', right_on='utc_time')
+'''
+print(bl0_merge)
+print(bl0_merge.iloc[[3]])
+print(bl0_merge.columns)
+'''
 
 print("-------------------------- CREATE TESTS DATAS --------------------------")
 # X to predict : temperature,pressure,humidity,wind_direction,wind_speed/kph
 # y to predict : PM2.5 (ug-m3) | PM10 (ug-m3)|  NO2 (ug-m3)
-'''
-x = aqi_forecast['MeasurementDateGMT']
-y = aqi_forecast['PM2.5 (ug/m3)']
-x = x[141602:141612]
-y = y[141602:141612]
-plt.plot(x,y)
-plt.xlabel('MeasurementDateGMT')
-plt.ylabel('PM2.5 Level')
-plt.title('PM2.5  from 2018/3/28 14:00 to 2018/3/29 0:00 , before interpolation')
-plt.show()
-'''
+
+# take less values for TESTS
+# Read in first 10 lines of table
+#bl0_merge_test = bl0_merge.head(10)
 
 print("-------------------------- CONVERT TO NUMPY --------------------------")
 
