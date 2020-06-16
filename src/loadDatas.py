@@ -179,11 +179,13 @@ print("-------------------------- MERGE DATAS  --------------------------")
 # TRY TAKE FOR ONE STATION : BL0
 # BASIC INFOS (IDs)
 
+# -- ICI ON ITERER SUR LES IDs :
 # bl0_airQuality_stations ->  id YYY :
 bl0_airQuality_station = airQuality_stations.loc[airQuality_stations['id']=='BL0',:]
 print("bl0_airQuality_station id: ")
 print(bl0_airQuality_station)
 
+# ON CHERCHERA DANS FORECAST ET OTHER PUIS CONCAT EN HAUTEUR
 #bl0_aqi_forecast <- id YYY
 bl0_aqi_forecast = aqi_forecast.loc[aqi_forecast['station_id']=='BL0',:]
 print("bl0_aqi_forecast : ")
@@ -216,70 +218,35 @@ print(bl0_aqi_forecast.columns)
 print(bl0_meo_grid.columns)
 '''
 bl0_merge =pd.merge(left=bl0_aqi_forecast, right=bl0_meo_grid, left_on='utc_time', right_on='utc_time')
-'''
+
 print(bl0_merge)
-print(bl0_merge.iloc[[3]])
+#print(bl0_merge.iloc[[3]])
 print(bl0_merge.columns)
-'''
 
-print("-------------------------- CREATE TESTS DATAS --------------------------")
-# X to predict : temperature,pressure,humidity,wind_direction,wind_speed/kph
-# y to predict : PM2.5 (ug-m3) | PM10 (ug-m3)|  NO2 (ug-m3)
-
-# take less values for TESTS
-# Read in first 10 lines of table
-#bl0_merge_test = bl0_merge.head(10)
+# SAVE csv :
+bl0_merge.to_csv(r'../final_project_data/merge/BL0.csv', index = False)
 
 print("-------------------------- CONVERT TO NUMPY --------------------------")
+# take less values for TESTS
+# Read in first 300 lines of table
+#bl0_merge_test = bl0_merge.head(300)
+bl0_merge = bl0_merge.to_numpy()
+print("test shape, 1st element, 2nd element, sum")
+print(bl0_merge.shape)
+print(bl0_merge[0])
+print(bl0_merge[1])
+print(bl0_merge[0][2]+bl0_merge[1][2])
 
-aqi_forecast = aqi_forecast.to_numpy()
-# select column 3 and 5 (PM2.5 and O3)
-data_predict_x_aqi_forecast = aqi_forecast[:, [2, 4]]
-# select column 4 : PM10
-data_predict_y_aqi_forecast = aqi_forecast[:, 3]
 
-print("TEST NUMPY DATAS (aqi forecast) : ")
-print(data_predict_x_aqi_forecast)
-print(data_predict_y_aqi_forecast)
-print(data_predict_x_aqi_forecast.shape)
-print(data_predict_y_aqi_forecast.shape)
-print(data_predict_y_aqi_forecast)
-
-print("---------------------- TESTS DATAS ---------------------------------")
-
-print("COMBINE : ")
-# https://numpy.org/doc/stable/user/basics.rec.html
-'''
-print(records)
-print("DATE : ")
-print(records['date'])
-print("N02 : ")
-print(records['N02'])
-print("PM2.5 : ")
-print(records['PM2.5'])
-'''
-
-print(aqi_forecast[141609])  # column filled  by interpolation
-print("7th element : ")
-print(aqi_forecast[7])
-print("9th element : ")
-print(aqi_forecast[9])
-print("1st parameter 9th element : ")
-print(aqi_forecast[9][0])
-print("3rd parameter 9th element : ")
-print(aqi_forecast[9][2])
-print("last element : ")
-print(aqi_forecast[-1])
-print("test sum :")
-print(aqi_forecast[7][3] + aqi_forecast[9][3])
-
-print("----------- END TEST DATAS ------------")
+print("-------------------------- CREATE TESTS DATAS --------------------------")
+# WE HAVE :
+# 'utc_time', 'station_id', 'PM2.5 (ug-m3)', 'PM10 (ug-m3)','NO2 (ug-m3)', 'stationName',
+# 'longitude', 'latitude', 'temperature', 'pressure', 'humidity', 'wind_direction', 'wind_speed/kph'
+# WE WANT :
+# X to predict : temperature,pressure,humidity,wind_direction,wind_speed/kph, AND 'PM2.5 (ug-m3)', 'PM10 (ug-m3)','NO2 (ug-m3)'
+# y to predict : PM2.5 (ug-m3) | PM10 (ug-m3)|  NO2 (ug-m3)
 
 '''
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-add second datas : London_historical_aqi_other_stations_20180331
-'''
-
 X_train, X_test = data_predict_x_aqi_forecast[:200], data_predict_x_aqi_forecast[200:300] # we use PM2.5 and N02
 y_train, y_test = data_predict_y_aqi_forecast[:200], data_predict_y_aqi_forecast[200:300] # we predict PM10
 
@@ -288,3 +255,4 @@ print(X_train.shape)
 print(X_test.shape)
 print(y_train.shape)
 print(y_test.shape)
+'''
