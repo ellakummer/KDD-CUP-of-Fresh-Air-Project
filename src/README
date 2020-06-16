@@ -1,0 +1,19 @@
+README
+
+mergeData.py :
+	merge all data in one file for each station.
+
+loadData.py :
+	open merged csv for each station and prepare the training, validation and tests sets. 
+
+plotsPmsNO2.py : 
+	plot PM2.5, PM10, NO2 for :
+		- small perdiod -> see interpolation
+		- two weeks -> see the day of the week influences
+		- one year -> see of the month influences
+
+predictionsTech.py : 
+	try the differents predictions techiques 
+
+
+test.py, mergeDataTest.py, loadDataTest.py : tests
