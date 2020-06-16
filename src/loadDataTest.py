@@ -5,6 +5,12 @@ import pandas as pd
 
 days = 2
 
+
+airQuality_stations = pd.read_csv('../final_project_data/London_AirQuality_Stations.csv')
+# ../final_project_data/merge/'+station+'.csv
+for station in airQuality_stations['id']:
+
+
 BL0_merge = pd.read_csv('../final_project_data/merge/BL0.csv')
 print(BL0_merge)
 
