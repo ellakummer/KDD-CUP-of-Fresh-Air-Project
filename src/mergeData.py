@@ -65,6 +65,7 @@ from mpl_toolkits import mplot3d
 # MODELS :
 # GradientBoostingRegressor, svm.SVC, RandomForestRegressor, LogisticGAM
 
+days = 2
 
 # ------- LOAD array London_historical_aqi_forecast_stations_20180331 ------
 
@@ -220,39 +221,7 @@ print(bl0_meo_grid.columns)
 bl0_merge =pd.merge(left=bl0_aqi_forecast, right=bl0_meo_grid, left_on='utc_time', right_on='utc_time')
 
 print(bl0_merge)
-#print(bl0_merge.iloc[[3]])
 print(bl0_merge.columns)
 
 # SAVE csv :
 bl0_merge.to_csv(r'../final_project_data/merge/BL0.csv', index = False)
-
-print("-------------------------- CONVERT TO NUMPY --------------------------")
-# take less values for TESTS
-# Read in first 300 lines of table
-#bl0_merge_test = bl0_merge.head(300)
-bl0_merge = bl0_merge.to_numpy()
-print("test shape, 1st element, 2nd element, sum")
-print(bl0_merge.shape)
-print(bl0_merge[0])
-print(bl0_merge[1])
-print(bl0_merge[0][2]+bl0_merge[1][2])
-
-
-print("-------------------------- CREATE TESTS DATAS --------------------------")
-# WE HAVE :
-# 'utc_time', 'station_id', 'PM2.5 (ug-m3)', 'PM10 (ug-m3)','NO2 (ug-m3)', 'stationName',
-# 'longitude', 'latitude', 'temperature', 'pressure', 'humidity', 'wind_direction', 'wind_speed/kph'
-# WE WANT :
-# X to predict : temperature,pressure,humidity,wind_direction,wind_speed/kph, AND 'PM2.5 (ug-m3)', 'PM10 (ug-m3)','NO2 (ug-m3)'
-# y to predict : PM2.5 (ug-m3) | PM10 (ug-m3)|  NO2 (ug-m3)
-
-'''
-X_train, X_test = data_predict_x_aqi_forecast[:200], data_predict_x_aqi_forecast[200:300] # we use PM2.5 and N02
-y_train, y_test = data_predict_y_aqi_forecast[:200], data_predict_y_aqi_forecast[200:300] # we predict PM10
-
-print("test to use shape: ")
-print(X_train.shape)
-print(X_test.shape)
-print(y_train.shape)
-print(y_test.shape)
-'''
