@@ -10,6 +10,12 @@ s1 = pd.Series(['X0', 'X1', 'X2', 'X3'], name='X')
 df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],'B': ['B0', 'B1', 'B2', 'B3'],'C': ['C0', 'C1', 'C2', 'C3'],'D': ['D0', 'D1', 'D2', 'D3']})
 df4 = pd.DataFrame({'B': ['B2', 'B3', 'B6', 'B7'],'D': ['D2', 'D3', 'D6', 'D7'],'F': ['F2', 'F3', 'F6', 'F7']})
 df3 = pd.DataFrame({'F': ['F2', 'F3', 'F6', 'F7'],'E': ['E2', 'E3', 'E6', 'E7'],'D': ['D1', 'D2', 'D3', 'D4']})
+df5 = pd.DataFrame({'F': ['A2', 'A3', 'A6', 'A7'],'G': ['B2', 'B3', 'B6', 'B7'],'D': ['C1', 'C2', 'C3', 'C4']})
+df6 = pd.DataFrame({'F': [],'G': [],'D': []})
+df6 = pd.DataFrame({'F': [],'G': [],'D': []})
+
+
+
 
 result = pd.concat([df4, s1], axis=1)
 
@@ -53,3 +59,20 @@ result = pd.merge(left=df1, right=df3, left_on='D', right_on='D')
 print(df1)
 print(df3)
 print(result)
+print("--")
+print(df3)
+print(df6)
+isempty = df3.empty
+print(isempty)
+isempty = df6.empty
+print(isempty)
+print("------------")
+x = "Python is "
+y = "awesome"
+z =  x + y
+print(z)
+
+print("------------")
+
+a = 'hahaha'
+print('lol'+a+'lol')

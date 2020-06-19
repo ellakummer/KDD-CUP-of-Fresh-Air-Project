@@ -49,6 +49,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
+# https://www.hindawi.com/journals/jece/2017/5106045/
 
 # https://medium.com/mongolian-data-stories/ulaanbaatar-air-pollution-part-1-35e17c83f70b (ici plus discret mdr)
 # https://medium.com/mongolian-data-stories/part-3-the-model-b2fb9a25a07c

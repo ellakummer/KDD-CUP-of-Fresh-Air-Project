@@ -14,7 +14,7 @@ print("------------------------------ LOAD DATA  ------------------------------"
 
 print(" -------------------- LOAD London_historical_aqi_forecast_stations_20180331")
 
-aqi_forecast = pd.read_csv('../final_project_data/London_historical_aqi_forecast_stations_20180331.csv')
+aqi_forecast = pd.read_csv('../final_project_data/London_historical_aqi_forecast_stations_20180331(copie).csv')
 aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
 aqi_forecast = aqi_forecast.fillna(aqi_forecast.mean())
 '''

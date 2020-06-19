@@ -8,13 +8,13 @@ days = 2
 
 airQuality_stations = pd.read_csv('../final_project_data/London_AirQuality_Stations.csv')
 # ../final_project_data/merge/'+station+'.csv
-for station in airQuality_stations['id']:
+#for station in airQuality_stations['id']:
 
 
 BL0_merge = pd.read_csv('../final_project_data/merge/BL0.csv')
 print(BL0_merge)
 
-print("-------------------------- CONVERT TO NUMPY --------------------------")
+print(" --- CONVERT TO NUMPY --- ")
 # WE HAVE :
 # 'utc_time', 'station_id', 'PM2.5 (ug-m3)', 'PM10 (ug-m3)','NO2 (ug-m3)', 'stationName',
 # 'longitude', 'latitude', 'temperature', 'pressure', 'humidity', 'wind_direction', 'wind_speed/kph'
@@ -27,9 +27,9 @@ print("X and y tests : ")
 print(X.shape)
 print(y.shape)
 
-print("-------------------------- CREATE TESTS DATA --------------------------")
+print(" --- CREATE SETS --- ")
 X_train, X_val = X[:200], X[200:300]
-y_train, y_val = y[days:200+days], y[200+days:300+days]
+y_train, y_val = y[days*24:200+days*24], y[200+days*24:300+days*24]
 
 print("tests shape : ")
 print(X_train.shape)
