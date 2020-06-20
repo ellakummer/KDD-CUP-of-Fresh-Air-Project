@@ -71,13 +71,7 @@ from mpl_toolkits import mplot3d
 # MODELS :
 # GradientBoostingRegressor, svm.SVC, RandomForestRegressor, LogisticGAM
 
-column1 = np.empty((0,1))
-column2 = np.empty((0,1))
-column3 = np.empty((0,1))
-column4 = np.empty((0,1))
-column5 = np.empty((0,1))
-data_predict_x = np.empty((0,2))
-
+'''
 with open('../final_project_data/London_historical_aqi_forecast_stations_20180331.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -98,55 +92,8 @@ with open('../final_project_data/London_historical_aqi_forecast_stations_2018033
         #if line_count == 11 : #test small
         if line_count == 301 : #test ok for first id
             break
-
-
-print("----------- TESTS DATAS ------------")
-
-print("COMBINE : ")
-# https://numpy.org/doc/stable/user/basics.rec.html
-records = np.rec.fromarrays((column1, column2, column3, column4, column5), names=('date', 'id', 'PM2.5', 'PM10', 'N02'))
 '''
-print(records)
-print("DATE : ")
-print(records['date'])
-print("N02 : ")
-print(records['N02'])
-print("PM2.5 : ")
-print(records['PM2.5'])
-'''
-
-print("#datas : ", line_count-1)
-print("test shape : ")
-print(records.shape)
-
-print("7th element : ")
-print(records[7])
-print("9th element : ")
-print(records[9])
-print("1st parameter 9th element : ")
-print(records[9][0])
-print("3rd parameter 9th element : ")
-print(records[9][2])
-print("last element : ")
-print(records[-1])
-print("test sum :")
-print(records[7][2] + records[9][2])
-
-print("----------- END TEST DATAS ------------")
-
-'''
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-add second datas : London_historical_aqi_other_stations_20180331
-'''
-
-X_train, X_test = data_predict_x[:200], data_predict_x[200:] # we use PM2.5 and N02
-y_train, y_test = column4[:200], column4[200:] # we predict PM10
-
-print("test to use shape: ")
-print(X_train.shape)
-print(X_test.shape)
-print(y_train.shape)
-print(y_test.shape)
+# OPEN LIKE IN LOAD DATA FILE
 
 
 print("----------- START TESTS : Gradient Tree Boosting ------------")
