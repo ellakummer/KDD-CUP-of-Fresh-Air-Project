@@ -1,12 +1,31 @@
+LINKED : 
+
 Beijing AirQuality Stations en csv formated 
-beijing_201802_201803_aq
-beijing 17 18 aq
-
-
-
+beijing_201802_201803_aq (2)
+beijing 17 18 aq (1)
 
 beijing_201802_201803_me
 beijing_17_18_meo
 
 Beijing_grid_weather_station
 Beijing_historical_meo_grid --> ../..
+
+--------------------------------------------------------------------------------------------------
+
+TO PREDICT : 
+beijing airquality station (stationId, longitude, latitude)
+
+beijing_grid_weather_station -beijing_grid_XX (stationName) -> beijing historical meo grid 
+-----> forget ?!
+
+beijing_grid_weather_station -latitude+longitude -> stationId(grid) -> beijing_17_18_meo -> stationId
+
+beijing_17_18 aq + beijing_201802_201803_aq : stationId -- ..meo
+
+SOUCIS : date début-fin !!! :
+aq : FROM 2017-01-01 14:00:00 TO 2018-03-31 15:00:00
+meo : FROM 2017-01-30 16:00:00 TO 2018-04-01 00:00:00
+-> FROM 2017-01-30 16:00:00 (cut aq) TO 2018-03-31 15:00:00 (cut meo)
+
+on va entrainer avec tout(genre faire le best model, etc...) puis on prendra juste ceux qu'on veut pour les tests
+

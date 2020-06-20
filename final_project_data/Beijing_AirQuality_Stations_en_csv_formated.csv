@@ -1,36 +1,36 @@
-﻿Latitude,Longitude,SiteType,SiteName,stationId
-39.929,116.417,Urban,Dongsi,dongsi_aq
-39.886,116.407,Urban,Tiantant,tiantant_aq
-39.929,116.339,Urban,Guanyuan,guanyuan_aq
-39.878,116.352,Urban,Wanshouxigong,wanshouxigong_aq
-39.982,116.397,Urban,Aotizhongxin,aotizhongxin_aq
-39.937,116.461,Urban,Nongzhanguan,nongzhanguan_aq
-39.987,116.287,Urban,Wanliu,wanliu_aq
-40.09,116.174,Urban,Beibuxinqu,beibuxinqu_aq
-40.002,116.207,Urban,Zhiwuyuan,zhiwuyuan_aq
-39.863,116.279,Urban,Fengtaihuayuan,fengtaihuayuan_aq
-39.824,116.146,Urban,Yungang,yungang_aq
-39.914,116.184,Urban,Gucheng,gucheng_aq
-39.742,116.136,Suburban,Fangshan,fangshan_aq
-39.718,116.404,Suburban,Daxing,daxing_aq
-39.795,116.506,Suburban,Yizhuang,yizhuang_aq
-39.886,116.663,Suburban,Tongzhou,tongzhou_aq
-40.127,116.655,Suburban,Shunyi,shunyi_aq
-40.217,116.23,Suburban,Pingchang,pingchang_aq
-39.937,116.106,Suburban,Mentougou,mentougou_aq
-40.143,117.1,Suburban,Pinggu,pinggu_aq
-40.328,116.628,Suburban,Huairou,huairou_aq
-40.37,116.832,Suburban,Miyun,miyun_aq
-40.453,115.972,Suburban,Yanqin,yanqin_aq
-40.292,116.22,Other,Dingling,dingling_aq
-40.365,115.988,Other,Badaling,badaling_aq
-40.499,116.911,Other,Miyunshuiku,miyunshuiku_aq
-40.1,117.12,Other,Donggaocun,donggaocun_aq
-39.712,116.783,Other,Yongledian,yongledian_aq
-39.52,116.3,Other,Yufa,yufa_aq
-39.58,116,Other,Liulihe,liulihe_aq
-39.899,116.395,Near Traffic,Qianmen,qianmen_aq
-39.876,116.394,Near Traffic,Yongdingmennei,yongdingmennei_aq
-39.954,116.349,Near Traffic,Xizhimenbei,xizhimenbei_aq
-39.856,116.368,Near Traffic,Nansanhuan,nansanhuan_aq
-39.939,116.483,Near Traffic,Dongsihua,dongsihua_aq
+﻿latitude,longitude,siteType,siteName,stationId
+39.929,116.417,Urban,Dongsi,dongsi
+39.886,116.407,Urban,Tiantant,tiantant
+39.929,116.339,Urban,Guanyuan,guanyuan
+39.878,116.352,Urban,Wanshouxigong,wanshouxigong
+39.982,116.397,Urban,Aotizhongxin,aotizhongxin
+39.937,116.461,Urban,Nongzhanguan,nongzhanguan
+39.987,116.287,Urban,Wanliu,wanliu
+40.09,116.174,Urban,Beibuxinqu,beibuxinqu
+40.002,116.207,Urban,Zhiwuyuan,zhiwuyuan
+39.863,116.279,Urban,Fengtaihuayuan,fengtaihuayuan
+39.824,116.146,Urban,Yungang,yungang
+39.914,116.184,Urban,Gucheng,gucheng
+39.742,116.136,Suburban,Fangshan,fangshan
+39.718,116.404,Suburban,Daxing,daxing
+39.795,116.506,Suburban,Yizhuang,yizhuang
+39.886,116.663,Suburban,Tongzhou,tongzhou
+40.127,116.655,Suburban,Shunyi,shunyi
+40.217,116.23,Suburban,Pingchang,pingchang
+39.937,116.106,Suburban,Mentougou,mentougou
+40.143,117.1,Suburban,Pinggu,pinggu
+40.328,116.628,Suburban,Huairou,huairou
+40.37,116.832,Suburban,Miyun,miyun
+40.453,115.972,Suburban,Yanqing,yanqing
+40.292,116.22,Other,Dingling,dingling
+40.365,115.988,Other,Badaling,badaling
+40.499,116.911,Other,Miyunshuiku,miyunshuiku
+40.1,117.12,Other,Donggaocun,donggaocun
+39.712,116.783,Other,Yongledian,yongledian
+39.52,116.3,Other,Yufa,yufa
+39.58,116,Other,Liulihe,liulihe
+39.899,116.395,Near Traffic,Qianmen,qianmen
+39.876,116.394,Near Traffic,Yongdingmennei,yongdingmennei
+39.954,116.349,Near Traffic,Xizhimenbei,xizhimenbei
+39.856,116.368,Near Traffic,Nansanhuan,nansanhuan
+39.939,116.483,Near Traffic,Dongsihua,dongsihua

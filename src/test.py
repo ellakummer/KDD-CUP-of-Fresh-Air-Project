@@ -11,6 +11,7 @@ df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'],'B': ['B0', 'B1', 'B2', 'B3'],
 df4 = pd.DataFrame({'B': ['B2', 'B3', 'B6', 'B7'],'D': ['D2', 'D3', 'D6', 'D7'],'F': ['F2', 'F3', 'F6', 'F7']})
 df3 = pd.DataFrame({'F': ['F2', 'F3', 'F6', 'F7'],'E': ['E2', 'E3', 'E6', 'E7'],'D': ['D1', 'D2', 'D3', 'D4']})
 df5 = pd.DataFrame({'F': ['A2', 'A3', 'A6', 'A7'],'G': ['B2', 'B3', 'B6', 'B7'],'D': ['C1', 'C2', 'C3', 'C4']})
+df7 = pd.DataFrame({'F': ['B2', 'B3', 'B6', 'B7'],'G': ['C2', 'C3', 'C6', 'C7'],'D': ['D1', 'D2', 'D3', 'D4']})
 df6 = pd.DataFrame({'F': [],'G': [],'D': []})
 df6 = pd.DataFrame({'F': [],'G': [],'D': []})
 
@@ -76,3 +77,8 @@ print("------------")
 
 a = 'hahaha'
 print('lol'+a+'lol')
+
+print("------------")
+#df5, df7
+result = pd.concat([df5,df7])
+print(result)
