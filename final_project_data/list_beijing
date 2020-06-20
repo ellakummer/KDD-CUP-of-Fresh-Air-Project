@@ -1,14 +1,82 @@
-LINKED : 
 
-Beijing AirQuality Stations en csv formated 
-beijing_201802_201803_aq (2)
-beijing 17 18 aq (1)
+--------------------------------------------------------------------------------------------------
 
-beijing_201802_201803_me
-beijing_17_18_meo
+ALL STATIONS TO PREDICT ARE IN .aq (et inversément)
 
-Beijing_grid_weather_station
-Beijing_historical_meo_grid --> ../..
+si pas equivalent de .aq dans meo -> prendre le plus proche grid : 
+
+dongsi -> beijing_grid_303
+tiantan -> beijing_grid_303
+guanyuan -> beijing_grid_282
+wanshouxigong -> beijing_grid_303
+aotizhongxin -> beijing_grid_304
+nongzhanguan -> beijing_grid_324
+wanliu -> beijing_grid_283
+beibuxinqu -> beijing_grid_263
+zhiwuyuan -> beijing_grid_262
+yungang -> beijing_grid_239
+gucheng -> beijing_grid_261
+yizhuang -> beijing_grid_323
+dingling -> beijing_grid_265
+badaling -> beijing_grid_224
+miyunshuiku -> beijing_grid_414
+donggaocun -> beijing_grid_452
+yongledian -> beijing_grid_385
+yufa -> beijing_grid_278
+liulihe -> beijing_grid_216
+qianmen -> beijing_grid_303
+yongdingmennei -> beijing_grid_303
+xizhimenbei -> beijing_grid_283
+nansanhuan -> beijing_grid_303
+dongsihua -> beijing_grid_324
+
+-> latitude+longitude in air_quality -> grid in beijing_grid_stations -> historical meo 
+
+-> grid to keep :
+beijing_grid_216
+beijing_grid_224 
+beijing_grid_239
+beijing_grid_262
+beijing_grid_261
+beijing_grid_263
+beijing_grid_265
+beijing_grid_278
+beijing_grid_282
+beijing_grid_283
+beijing_grid_303
+beijing_grid_304
+beijing_grid_323
+beijing_grid_324
+beijing_grid_385
+beijing_grid_414
+beijing_grid_452
+
+--------------------------------------------------------------------------------------------------
+
+!! in beijing_201802_201803_me.csv : 00:00:00 lines are doubled
+
+DATES PROBLEMS : 
+
+zhiwuyuan : too many datas missing before 2018-03-21
+
+fangshan : 9377 -> 9424
+fengataihuayuan : 9376 -> 9423
+huairou : 9376 -> 9423
+tongzhou
+
+mentougou : 9375 -> 9422
+
+pinggu : 9374 -> 9421
+
+miyun : 9377 -> 9424
+pingchange : same
+daxing : 9377 -> 9424
+shunyi
+yanqing
+
+
+rest : 10044 -> 10091
+
 
 --------------------------------------------------------------------------------------------------
 
@@ -27,5 +95,11 @@ aq : FROM 2017-01-01 14:00:00 TO 2018-03-31 15:00:00
 meo : FROM 2017-01-30 16:00:00 TO 2018-04-01 00:00:00
 -> FROM 2017-01-30 16:00:00 (cut aq) TO 2018-03-31 15:00:00 (cut meo)
 
-on va entrainer avec tout(genre faire le best model, etc...) puis on prendra juste ceux qu'on veut pour les tests
+on va entrainer avec tout(genre faire le best model, etc...) puis on prendra juste ceux qu'on veut  pour les tests
+
+--------------------------------------------------------------------------------------------------
+
+dates manquantes ok -> on fait par station
+
+
 

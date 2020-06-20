@@ -82,3 +82,23 @@ print("------------")
 #df5, df7
 result = pd.concat([df5,df7])
 print(result)
+
+print("------------")
+
+a = float(f"{30.97:.1f}")
+print(a)
+
+print("-------")
+df8 = pd.DataFrame({'F': ['F2', 'F3', 'F3', 'F7'],'E': ['E2', 'E3', 'E3', 'E7'],'D': ['D1', 'D2', 'D3', 'D4']})
+print(df8)
+df8.drop_duplicates(subset =['E','F'], keep = 'first', inplace = True)
+print(df8)
+
+print("-----")
+data = {"Name": ["James", "Alice", "Phil", "James"],
+		"Age": [24, 28, 40, 24],
+		"Sex": ["Male", "Female", "Male", "Male"]}
+df = pd.DataFrame(data)
+print(df)
+df = df.drop_duplicates()
+print(df)

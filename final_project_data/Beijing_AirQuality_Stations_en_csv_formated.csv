@@ -1,6 +1,6 @@
 ﻿latitude,longitude,siteType,siteName,stationId
 39.929,116.417,Urban,Dongsi,dongsi
-39.886,116.407,Urban,Tiantant,tiantant
+39.886,116.407,Urban,Tiantan,tiantan
 39.929,116.339,Urban,Guanyuan,guanyuan
 39.878,116.352,Urban,Wanshouxigong,wanshouxigong
 39.982,116.397,Urban,Aotizhongxin,aotizhongxin
@@ -28,9 +28,9 @@
 40.1,117.12,Other,Donggaocun,donggaocun
 39.712,116.783,Other,Yongledian,yongledian
 39.52,116.3,Other,Yufa,yufa
-39.58,116,Other,Liulihe,liulihe
+39.58,116.0,Other,Liulihe,liulihe
 39.899,116.395,Near Traffic,Qianmen,qianmen
 39.876,116.394,Near Traffic,Yongdingmennei,yongdingmennei
 39.954,116.349,Near Traffic,Xizhimenbei,xizhimenbei
 39.856,116.368,Near Traffic,Nansanhuan,nansanhuan
-39.939,116.483,Near Traffic,Dongsihua,dongsihua
+39.939,116.483,Near Traffic,Dongsihuan,dongsihuan

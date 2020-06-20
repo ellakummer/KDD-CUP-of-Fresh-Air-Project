@@ -48,8 +48,11 @@ print(beijing_201802_201803_aq.columns)
 
 print("")
 #------- LOAD beijing_17_18_meo ------
-print("-------------------- LOAD beijing_17_18_meo")
-beijing_17_18_meo = pd.read_csv('../final_project_data/beijing_17_18_meo_nocoord.csv')
+print("-------------------- LOAD beijing_17_18_meo_cut")
+beijing_17_18_meo = pd.read_csv('../final_project_data/beijing_17_18_meo_cut.csv')
+
+beijing_17_18_meo = beijing_17_18_meo.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+beijing_17_18_meo = beijing_17_18_meo.fillna(beijing_17_18_meo.mean())
 
 print("test shape beijing_17_18_meo: ")
 print(beijing_17_18_meo.shape)
@@ -62,8 +65,14 @@ print(beijing_17_18_meo.columns)
 
 print("")
 # ------- LOAD beijing_201802_201803_me ------
-print(" -------------------- LOAD beijing_201802_201803_me")
-beijing_201802_201803_me = pd.read_csv('../final_project_data/beijing_201802_201803_me.csv')
+print(" -------------------- LOAD beijing_201802_201803_me_cut")
+beijing_201802_201803_me = pd.read_csv('../final_project_data/beijing_201802_201803_me_cut.csv')
+
+# remove duplicated lines 00:00:00
+beijing_201802_201803_me.drop_duplicates(subset =['station_id','utc_time'], keep = 'first', inplace = True)
+
+beijing_201802_201803_me = beijing_201802_201803_me.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+beijing_201802_201803_me = beijing_201802_201803_me.fillna(beijing_201802_201803_me.mean())
 
 print("test shape beijing_201802_201803_me: ")
 print(beijing_201802_201803_me.shape)
@@ -72,6 +81,37 @@ C_mat_beijing_201802_201803_me= beijing_201802_201803_me.corr()
 print(C_mat_beijing_201802_201803_me)
 print(beijing_201802_201803_me)
 print(beijing_201802_201803_me.columns)
+
+# ------- LOAD Beijing_grid_weather_station ------
+print(" -------------------- LOAD Beijing_grid_weather_station")
+Beijing_grid_weather_station = pd.read_csv('../final_project_data/Beijing_grid_weather_station.csv')
+
+print("test shape Beijing_grid_weather_station: ")
+print(Beijing_grid_weather_station.shape)
+print(Beijing_grid_weather_station)
+print(Beijing_grid_weather_station.columns)
+
+# ------- LOAD beijing_201802_201803_me ------
+print(" -------------------- LOAD Beijing_AirQuality_Stations_en_csv_formated")
+Beijing_AirQuality_Stations_en_csv_formated = pd.read_csv('../final_project_data/Beijing_AirQuality_Stations_en_csv_formated.csv')
+
+print("test shape Beijing_AirQuality_Stations_en_csv_formated: ")
+print(Beijing_AirQuality_Stations_en_csv_formated.shape)
+print(Beijing_AirQuality_Stations_en_csv_formated)
+print(Beijing_AirQuality_Stations_en_csv_formated.columns)
+
+# ------- LOAD beijing_201802_201803_me ------
+
+print(" -------------------- LOAD Beijing_historical_meo_grid")
+Beijing_historical_meo_grid = pd.read_csv('../../Beijing_historical_meo_grid.csv')
+
+#Beijing_historical_meo_grid = Beijing_historical_meo_grid.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+#Beijing_historical_meo_grid = Beijing_historical_meo_grid.fillna(Beijing_historical_meo_grid.mean())
+
+print("test shape Beijing_historical_meo_grid: ")
+print(Beijing_historical_meo_grid.shape)
+print(Beijing_historical_meo_grid)
+print(Beijing_historical_meo_grid.columns)
 
 
 print("")
@@ -84,65 +124,87 @@ print(beijing_aq.shape)
 print(beijing_aq.columns)
 print(beijing_meo.shape)
 print(beijing_meo.columns)
-
-# fangshan
 '''
-print("-------------------------- MERGE DATAS  --------------------------")
-# so we have : aqi_forecast, aqi_other, airQuality_stations, grid_stations, meo_grid
-# TRY TAKE FOR ONE STATION : BL0
-# BASIC INFOS (IDs)
+print("-------------------------- SELECT GRID IDs --------------------------")
 
-# -- ICI ON ITERER SUR LES IDs :
-# bl0_airQuality_stations ->  id YYY :
-bl0_airQuality_station = airQuality_stations.loc[airQuality_stations['id']=='BL0',:]
-print("bl0_airQuality_station id: ")
-print(bl0_airQuality_station)
+for s in Beijing_AirQuality_Stations_en_csv_formated['stationId']:
+    dongsi_station = Beijing_AirQuality_Stations_en_csv_formated.loc[Beijing_AirQuality_Stations_en_csv_formated['stationId']==s,:]
+    print(dongsi_station)
+    longitude_station = float(f"{dongsi_station['longitude'].values[0]:.1f}")
+    latitude_station = float(f"{dongsi_station['latitude'].values[0]:.1f}")
+    print("longitude station : ")
+    print(longitude_station)
+    print("latitude station : ")
+    print(latitude_station)
 
-# ON CHERCHERA DANS FORECAST ET OTHER PUIS CONCAT EN HAUTEUR
-#bl0_aqi_forecast <- id YYY
-bl0_aqi_forecast = aqi_forecast.loc[aqi_forecast['station_id']=='BL0',:]
-print("bl0_aqi_forecast : ")
-print(bl0_aqi_forecast)
-#print(bl0_aqi_forecast.iloc[[3]])
-bl0_aqi_other = aqi_other.loc[aqi_other['station_id']=='BL0',:]
-print("bl0_aqi_other : ")
-print(bl0_aqi_other)
+    station_grid_station = Beijing_grid_weather_station.loc[Beijing_grid_weather_station['longitude']==longitude_station,:].loc[Beijing_grid_weather_station['latitude']==latitude_station,:]['stationName'].values[0]
+    print("station_grid_station id : ")
+    print(station_grid_station)
+'''
+'''
+print("-------------------------- MERGE DATAS MEO+AQ  --------------------------")
 
-#bl0_grid_stations : id YYY --> id london_grid_XX
-longitude_bl0 = float(f"{bl0_airQuality_station['Longitude'].values[0]:.1f}")
-latitude_bl0 = float(f"{bl0_airQuality_station['Latitude'].values[0]:.1f}")
-print("longitude bl0 : ")
-print(longitude_bl0)
-print("latitude bl0 : ")
-print(latitude_bl0)
-#print(type(longitude_bl0))
-#print(type(latitude_bl0))
+station = 'fangshan'
+fangshan_aqi_forecast = beijing_aq.loc[beijing_aq['stationId']==station,:]
+fangshan_meo_grid = beijing_meo.loc[beijing_meo['station_id']==station,:]
 
-bl0_grid_station = grid_stations.loc[grid_stations['longitude']==longitude_bl0,:].loc[grid_stations['latitude']==latitude_bl0,:]['stationName'].values[0]
-print("bl0_grid_station id : ")
-print(bl0_grid_station)
+print(fangshan_aqi_forecast.shape)
+print(fangshan_meo_grid.shape)
 
+fangshan_merge =pd.merge(left=fangshan_aqi_forecast, right=fangshan_meo_grid, left_on='utc_time', right_on='utc_time')
 
-#bl0_meo_grid <- id london_grid_XX
-bl0_meo_grid = meo_grid.loc[meo_grid['stationName']==bl0_grid_station,:]
-print("bl0_meo_grid: ")
-print(bl0_meo_grid)
-
-print("MERGE")
-
-#print(bl0_aqi_forecast.columns)
-#print(bl0_aqi_other.columns
-#print(bl0_meo_grid.columns)
-
-if bl0_aqi_forecast.empty :
-    bl0_merge =pd.merge(left=bl0_aqi_other, right=bl0_meo_grid, left_on='utc_time', right_on='utc_time')
-else :
-    bl0_merge =pd.merge(left=bl0_aqi_forecast, right=bl0_meo_grid, left_on='utc_time', right_on='utc_time')
-
-
-print(bl0_merge)
-print(bl0_merge.columns)
+print(fangshan_merge)
+print(fangshan_merge.columns)
 
 # SAVE csv :
-bl0_merge.to_csv(r'../final_project_data/mergeBeijing/BL0.csv', index = False)
+fangshan_merge.to_csv(r'../final_project_data/mergeBeijing/fangshan.csv', index = False)
+
+print("-------------------------- MERGE DATAS AQ + GRID --------------------------")
+
+station = 'dongsi'
+dongsi_aqi_forecast = beijing_aq.loc[beijing_aq['stationId']==station,:]
+print(dongsi_aqi_forecast.shape)
+
+dongsi_station = Beijing_AirQuality_Stations_en_csv_formated.loc[Beijing_AirQuality_Stations_en_csv_formated['stationId']==station,:]
+print(dongsi_station)
+longitude_station = float(f"{dongsi_station['longitude'].values[0]:.1f}")
+latitude_station = float(f"{dongsi_station['latitude'].values[0]:.1f}")
+print("longitude station : ")
+print(longitude_station)
+print("latitude station : ")
+print(latitude_station)
+
+station_grid_station = Beijing_grid_weather_station.loc[Beijing_grid_weather_station['longitude']==longitude_station,:].loc[Beijing_grid_weather_station['latitude']==latitude_station,:]['stationName'].values[0]
+print("station_grid_station id : ")
+print(station_grid_station)
+
+station_meo_grid = Beijing_historical_meo_grid.loc[Beijing_historical_meo_grid['stationName']==station_grid_station,:]
+station_meo_grid = station_meo_grid.fillna(station_meo_grid.mean())
+print("station_meo_grid: ")
+print(station_meo_grid)
+
+dongsi_merge =pd.merge(left=dongsi_aqi_forecast, right=station_meo_grid, left_on='utc_time', right_on='utc_time')
+
+print(dongsi_merge)
+print(dongsi_merge.columns)
+
+# SAVE csv :
+fangshan_merge.to_csv(r'../final_project_data/mergeBeijing/dongsi.csv', index = False)
 '''
+
+print("-------------------------- MERGE DATAS  --------------------------")
+for station in Beijing_AirQuality_Stations_en_csv_formated['stationId']:
+
+    station_aqi_forecast = beijing_aq.loc[beijing_aq['stationId']==station,:]
+
+    station_meo_grid = beijing_meo.loc[beijing_meo['station_id']==station,:]
+    if station_meo_grid.empty :
+        station_line = Beijing_AirQuality_Stations_en_csv_formated.loc[Beijing_AirQuality_Stations_en_csv_formated['stationId']==station,:]
+        longitude_station = float(f"{station_line['longitude'].values[0]:.1f}")
+        latitude_station = float(f"{station_line['latitude'].values[0]:.1f}")
+        station_grid_name = Beijing_grid_weather_station.loc[Beijing_grid_weather_station['longitude']==longitude_station,:].loc[Beijing_grid_weather_station['latitude']==latitude_station,:]['stationName'].values[0]
+        station_meo_grid = Beijing_historical_meo_grid.loc[Beijing_historical_meo_grid['stationName']==station_grid_name,['stationName','utc_time','temperature','pressure','humidity','wind_direction','wind_speed']]
+        station_meo_grid = station_meo_grid.fillna(station_meo_grid.mean())
+
+    merge_file =pd.merge(left=station_aqi_forecast, right=station_meo_grid, left_on='utc_time', right_on='utc_time')
+    merge_file.to_csv(r'../final_project_data/mergeBeijing/'+station+'.csv', index = False)
