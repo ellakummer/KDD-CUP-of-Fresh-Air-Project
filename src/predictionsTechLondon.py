@@ -75,9 +75,14 @@ from mpl_toolkits import mplot3d
 
 print("----------- LOAD DATAS ------------")
 
+X_train = np.empty([198,3,8])
+y_train = np.empty([198,2])
+X_val = np.empty([100,3,8])
+y_val = np.empty([100,2])
+
 days = 2
 stations = ['BL0', 'BX1', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HR1', 'HV1', 'KC1', 'KF1', 'LH0', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
-stations = ['BL0'] # pick one
+#stations = ['BL0'] # pick one
 for s in stations :
     print(s)
     all = pd.read_csv('../final_project_data/merge/'+s+'.csv')
@@ -88,41 +93,57 @@ for s in stations :
     else :
         startDate = 10656
         endDate = 10703
-    X_test = all.loc[startDate:endDate,['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
-    y_test = all.loc[startDate:endDate,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    # SEE YOU LATER TESTS :)
+    #X_test = all.loc[startDate:endDate,['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    #y_test = all.loc[startDate:endDate,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     y = all[['PM2.5 (ug-m3)','PM10 (ug-m3)']].to_numpy()
     # OPTION 1 : DECALER EN JOURs
     X_train1, X_val1 = X[:200], X[200:300]
     y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
+    '''
     print("option 1 : ")
     print(X_train1.shape)
     print(y_train1.shape)
     print(X_val1.shape)
     print(y_val1.shape)
+    '''
     # OPTION 2 : DECALER EN HEURE
     print("option 2 : ")
     X_train2, X_val2 = X[:200], X[200:300]
     y_train2, y_val2 = y[1:201], y[201:301]
+    '''
     print(X_train2.shape)
     print(y_train2.shape)
     print(X_val2.shape)
     print(y_val2.shape)
+    '''
     # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
     print("option 3 : ")
-    X_train3, X_val3 = X[:200], X[200:300]
     X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
     X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
-    y_train3, y_val3 = y[1:201], y[201:301]
+    y_train3, y_val3 = y[3:201], y[201:301]
     '''
     print(X_train3[0])
     print(X_val3[0])
     print(X_train3.shape)
+    print(y_train3.shape)
     print(X_val3.shape)
+    print(y_val3.shape)
     '''
-    # FINAL : CONCAT ?
-    print("final : ")
+    print("concat : ")
+    X_train = np.append(X_train, X_train3,axis=0)
+    y_train = np.append(y_train, y_train3,axis=0)
+    X_val = np.append(X_val, X_val3,axis=0)
+    y_val = np.append(y_val, y_val3,axis=0)
 
+print("final matrix : ")
+X_train = X_train[198:]
+y_train = y_train[198:]
+X_val= X_val[100:]
+y_val = y_val[100:]
+
+print("----------- START TESTS : Linerar Regression ------------")
 
 
 print("----------- START TESTS : Gradient Tree Boosting ------------")
@@ -147,7 +168,7 @@ for esti in n_est :
         for depth in max_depths :
             est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train, y_train)
             # make cross validation error
-            error = mean_squared_error(y_test, est.predict(X_test))
+            error = mean_squared_error(y_val, est.predict(X_val))
             if error < min_error :
                 min_error = error
                 best_n_est = esti
@@ -165,13 +186,18 @@ print("with max_depth : ")
 print(best_depth)
 est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
 pred = est.predict(X_test)
+
+# COMPARER DEUX PLOTS :
+# Y_TEST REELS A PREDIRE
+# Y_TEST QUE NOUS ON A PREDIT
+
 # Calculate probabilities
 #est_prob = est.predict_proba(X_test)
 # Calculate confusion matrix
 #confusion_est = confusion_matrix(y_test,pred)
 #print(confusion_est)
-'''
-'''
+
+
 for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
