@@ -102,3 +102,11 @@ df = pd.DataFrame(data)
 print(df)
 df = df.drop_duplicates()
 print(df)
+
+print("-------")
+
+a = np.array([1,2,3])
+print(a)
+b = np.array([[1,2,3],[4,5,6]])
+print(b)
+print(np.concatenate((a, b), axis=0))
