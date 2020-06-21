@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import pandas as pd
 # for random forest
 import sklearn
 from sklearn.datasets import make_regression
@@ -70,30 +71,58 @@ from mpl_toolkits import mplot3d
 
 # MODELS :
 # GradientBoostingRegressor, svm.SVC, RandomForestRegressor, LogisticGAM
+# AND TRY LINEAR REGRESSION TOO
 
-'''
-with open('../final_project_data/London_historical_aqi_forecast_stations_20180331.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 0
-    for row in csv_reader:
-        #print(', '.join(row))
-        if line_count != 0 :
-            column1 = np.append(column1, np.array([[row[1]]]))
-            column2 = np.append(column2, np.array([[row[2]]]))
-            column3 = np.append(column3, np.array([[float(row[3])]]))
-            column4 = np.append(column4, np.array([[float(row[4])]]))
-            column5 = np.append(column5, np.array([[float(row[5])]]))
+print("----------- LOAD DATAS ------------")
 
-            data_predict_x = np.append(data_predict_x, np.array([[float(row[3]), float(row[5])]]), axis = 0)
+days = 2
+stations = ['BL0', 'BX1', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HR1', 'HV1', 'KC1', 'KF1', 'LH0', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
+stations = ['BL0'] # pick one
+for s in stations :
+    print(s)
+    all = pd.read_csv('../final_project_data/merge/'+s+'.csv')
+    print(all.shape)
+    if s == 'CT2' :
+        startDate = 9240
+        endDate = 9287
+    else :
+        startDate = 10656
+        endDate = 10703
+    X_test = all.loc[startDate:endDate,['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    y_test = all.loc[startDate:endDate,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    y = all[['PM2.5 (ug-m3)','PM10 (ug-m3)']].to_numpy()
+    # OPTION 1 : DECALER EN JOURs
+    X_train1, X_val1 = X[:200], X[200:300]
+    y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
+    print("option 1 : ")
+    print(X_train1.shape)
+    print(y_train1.shape)
+    print(X_val1.shape)
+    print(y_val1.shape)
+    # OPTION 2 : DECALER EN HEURE
+    print("option 2 : ")
+    X_train2, X_val2 = X[:200], X[200:300]
+    y_train2, y_val2 = y[1:201], y[201:301]
+    print(X_train2.shape)
+    print(y_train2.shape)
+    print(X_val2.shape)
+    print(y_val2.shape)
+    # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
+    print("option 3 : ")
+    X_train3, X_val3 = X[:200], X[200:300]
+    X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
+    y_train3, y_val3 = y[1:201], y[201:301]
+    '''
+    print(X_train3[0])
+    print(X_val3[0])
+    print(X_train3.shape)
+    print(X_val3.shape)
+    '''
+    # FINAL : CONCAT ?
+    print("final : ")
 
-        line_count += 1
-        #if line_count == 100000 : #test almost all
-        #if line_count == 10800 : #test first id
-        #if line_count == 11 : #test small
-        if line_count == 301 : #test ok for first id
-            break
-'''
-# OPEN LIKE IN LOAD DATA FILE
 
 
 print("----------- START TESTS : Gradient Tree Boosting ------------")
