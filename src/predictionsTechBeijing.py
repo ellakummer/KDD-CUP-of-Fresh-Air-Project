@@ -77,11 +77,20 @@ from mpl_toolkits import mplot3d
 print("----------- LOAD DATAS ------------")
 
 X_train = np.empty([198,3,11])
-y_train = np.empty([198,3])
-X_val = np.empty([100,3,11])
-y_val = np.empty([100,3])
 X_train_app = np.empty([198,33])
+
+y_train = np.empty([198,3])
+y_train_app1 = np.empty([198])
+y_train_app2 = np.empty([198])
+y_train_app3 = np.empty([198])
+
+X_val = np.empty([100,3,11])
 X_val_app = np.empty([100,33])
+
+y_val = np.empty([100,3])
+y_val_app1 = np.empty([100])
+y_val_app2 = np.empty([100])
+y_val_app3 = np.empty([100])
 
 
 days = 2
@@ -157,32 +166,64 @@ for s in stations :
     X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
     X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
     y_train3, y_val3 = y[3:201], y[201:301]
-
+    y_train4,y_val4 = y[3:201,0], y[201:301,0]
+    y_train5,y_val5 = y[3:201,1], y[201:301,1]
+    y_train6,y_val6 = y[3:201,2], y[201:301,2]
+    print(y_train3.shape)
+    '''
     print(X_train4[0])
     print(X_val4[0])
     print(X_train4.shape)
     print(X_val4.shape)
-
+    print(y_train4.shape)
+    print(y_train5.shape)
+    print(y_train6.shape)
+    print(y_val4.shape)
+    print(y_val5.shape)
+    print(y_val6.shape)
+    '''
     #print("concat option3 : ")
     X_train = np.append(X_train, X_train3,axis=0)
-    y_train = np.append(y_train, y_train3,axis=0)
     X_train_app = np.append(X_train_app, X_train4,axis=0)
+    y_train = np.append(y_train, y_train3,axis=0)
+    y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
+    y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
+    y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
     X_val = np.append(X_val, X_val3,axis=0)
     X_val_app = np.append(X_val_app, X_val4,axis=0)
     y_val = np.append(y_val, y_val3,axis=0)
+    y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
+    y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
+    y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
 
 print("final matrix : ")
 X_train = X_train[198:]
 X_train_app = X_train_app[198:]
+
 y_train = y_train[198:]
+y_train_app1 = y_train_app1[198:]
+y_train_app2 = y_train_app2[198:]
+y_train_app3 = y_train_app3[198:]
+
 X_val= X_val[100:]
 X_val_app = X_val_app[100:]
+
 y_val = y_val[100:]
+y_val_app1 = y_val_app1[100:]
+y_val_app2 = y_val_app2[100:]
+y_val_app3 = y_val_app3[100:]
+'''
 print(X_train.shape)
 print(X_val.shape)
 print(X_train_app.shape)
 print(X_val_app.shape)
-
+print(y_train_app1.shape)
+print(y_train_app2.shape)
+print(y_train_app3.shape)
+print(y_val_app1.shape)
+print(y_val_app2.shape)
+print(y_val_app3.shape)
+'''
 
 print("----------- START TESTS : Linerar Regression ------------")
 
@@ -219,9 +260,11 @@ max_depths = np.array([1,2])
 for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
-            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train, y_train)
+            print(X_train_app.shape)
+            print(y_train_app1.shape)
+            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
             # make cross validation error
-            error = mean_squared_error(y_val, est.predict(X_val))
+            error = mean_squared_error(y_val, est.predict(X_val_app))
             if error < min_error :
                 min_error = error
                 best_n_est = esti
@@ -237,8 +280,8 @@ print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
-pred = est.predict(X_test)
+est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app, y_train)
+pred = est.predict(X_val_app) # CHANGE IN TEST
 
 # COMPARER DEUX PLOTS :
 # Y_TEST REELS A PREDIRE
