@@ -32,6 +32,12 @@ from pygam import LinearGAM
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import log_loss
+
+from sklearn.linear_model import LinearRegression
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 # for Multiclass Neural Network
 '''
 from keras.callbacks import ModelCheckpoint
@@ -74,19 +80,36 @@ from mpl_toolkits import mplot3d
 # AND TRY LINEAR REGRESSION TOO
 
 print("----------- LOAD DATAS ------------")
-
+'''
 X_train = np.empty([198,3,8])
 y_train = np.empty([198,2])
 X_val = np.empty([100,3,8])
 y_val = np.empty([100,2])
+'''
+
+X_train = np.empty([198,3,8])
+X_train_app = np.empty([198,24])
+
+y_train = np.empty([198,2])
+y_train_app1 = np.empty([198])
+y_train_app2 = np.empty([198])
+y_train_app3 = np.empty([198])
+
+X_val = np.empty([100,3,8])
+X_val_app = np.empty([100,24])
+
+y_val = np.empty([100,2])
+y_val_app1 = np.empty([100])
+y_val_app2 = np.empty([100])
+y_val_app3 = np.empty([100])
 
 days = 2
 stations = ['BL0', 'BX1', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HR1', 'HV1', 'KC1', 'KF1', 'LH0', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
 #stations = ['BL0'] # pick one
 for s in stations :
-    print(s)
+    #print(s)
     all = pd.read_csv('../final_project_data/merge/'+s+'.csv')
-    print(all.shape)
+    #print(all.shape)
     if s == 'CT2' :
         startDate = 9240
         endDate = 9287
@@ -98,9 +121,12 @@ for s in stations :
     #y_test = all.loc[startDate:endDate,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     y = all[['PM2.5 (ug-m3)','PM10 (ug-m3)']].to_numpy()
+
+
     # OPTION 1 : DECALER EN JOURs
     X_train1, X_val1 = X[:200], X[200:300]
     y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
+
     '''
     print("option 1 : ")
     print(X_train1.shape)
@@ -108,8 +134,9 @@ for s in stations :
     print(X_val1.shape)
     print(y_val1.shape)
     '''
+
     # OPTION 2 : DECALER EN HEURE
-    print("option 2 : ")
+    #print("option 2 : ")
     X_train2, X_val2 = X[:200], X[200:300]
     y_train2, y_val2 = y[1:201], y[201:301]
     '''
@@ -119,10 +146,15 @@ for s in stations :
     print(y_val2.shape)
     '''
     # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
-    print("option 3 : ")
+    #print("option 3 : ")
     X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
     X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
     y_train3, y_val3 = y[3:201], y[201:301]
+    X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
+    y_train4,y_val4 = y[3:201,0], y[201:301,0]
+    y_train5,y_val5 = y[3:201,1], y[201:301,1]
+
     '''
     print(X_train3[0])
     print(X_val3[0])
@@ -130,35 +162,96 @@ for s in stations :
     print(y_train3.shape)
     print(X_val3.shape)
     print(y_val3.shape)
-    '''
+
     print("concat : ")
     X_train = np.append(X_train, X_train3,axis=0)
     y_train = np.append(y_train, y_train3,axis=0)
     X_val = np.append(X_val, X_val3,axis=0)
     y_val = np.append(y_val, y_val3,axis=0)
+    '''
 
+    #print(y_train.shape)
+    #print(y_train3.shape)
+    X_train = np.append(X_train, X_train3,axis=0)
+    X_train_app = np.append(X_train_app, X_train4,axis=0)
+    y_train = np.append(y_train, y_train3,axis=0)
+    y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
+    y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
+    #y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
+    X_val = np.append(X_val, X_val3,axis=0)
+    X_val_app = np.append(X_val_app, X_val4,axis=0)
+    y_val = np.append(y_val, y_val3,axis=0)
+    y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
+    y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
+    #y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
+
+'''
 print("final matrix : ")
 X_train = X_train[198:]
 y_train = y_train[198:]
 X_val= X_val[100:]
 y_val = y_val[100:]
+'''
+
+#print("final matrix : ")
+X_train = X_train[198:]
+X_train_app = X_train_app[198:]
+
+y_train = y_train[198:]
+y_train_app1 = y_train_app1[198:]
+y_train_app2 = y_train_app2[198:]
+#y_train_app3 = y_train_app3[198:]
+
+X_val= X_val[100:]
+X_val_app = X_val_app[100:]
+
+y_val = y_val[100:]
+y_val_app1 = y_val_app1[100:]
+y_val_app2 = y_val_app2[100:]
+#y_val_app3 = y_val_app3[100:]
+
 
 print("----------- START TESTS : Linerar Regression ------------")
 
+'''
+X_train_l = X_train_app
+y_train_l = y_train_app1
+#X_test_l = X_test
+X_val_l = X_val_app
+y_val_l = y_val_app1
+
+
+reg = LinearRegression().fit(X_train_l,y_train_l)
+err = mean_squared_error(y_val_l,reg.predict(X_val_l))
+
+#pred = reg.predict(X_test_l)
+#print(pred)
+
+'''
+
+# COMPARER DEUX PLOTS :
+# Y_TEST REELS A PREDIRE
+# Y_TEST QUE NOUS ON A PREDIT
+
+
+print("----------- END TESTS : Linerar Regression ------------")
 
 print("----------- START TESTS : Gradient Tree Boosting ------------")
 # https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting
-'''
-ON SEPARERA ON FONCTION PLUS TARD
-'''
-#TO FIT : n_estimators, learning rate, AND max_depth
-'''
-min_error = 1000
 
+# ON SEPARERA ON FONCTION PLUS TARD
+
+#TO FIT : n_estimators, learning rate, AND max_depth
+
+
+min_error = 10000
+'''
 n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600,750,1000,1250,1500,1750])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
+'''
 
+'''
 n_est = np.array([1, 2, 3])
 learning_rates = np.array([0.01, 0.02, 0.03])
 max_depths = np.array([1,2])
@@ -166,9 +259,10 @@ max_depths = np.array([1,2])
 for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
-            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train, y_train)
+            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
             # make cross validation error
-            error = mean_squared_error(y_val, est.predict(X_val))
+            error = mean_squared_error(y_val_app2, est.predict(X_val_app))
+            print(error)
             if error < min_error :
                 min_error = error
                 best_n_est = esti
@@ -201,8 +295,8 @@ pred = est.predict(X_test)
 for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
-'''
 
+'''
 # OR :
 '''
 # https://www.datacareer.ch/blog/parameter-tuning-in-gradient-boosting-gbm-with-python/
@@ -211,9 +305,10 @@ p_test3 = {'max_depth':[2,3,4,5,6,7], 'learning_rate':[0.15,0.1,0.05,0.01,0.005,
 
 tuning = GridSearchCV(estimator =GradientBoostingRegressor(random_state=0, loss = 'ls'),
             param_grid = p_test3, scoring='neg_mean_squared_error', cv=5)
-tuning.fit(X_train,y_train)
+tuning.fit(X_train_app,y_train_app1)
 print(tuning.best_params_, tuning.best_score_)
 '''
+
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
 print("----------- START TESTS : SVM / cross validation ------------")
@@ -243,14 +338,22 @@ of the model across all repeats and folds. The scikit-learn library makes the
 MAE negative so that it is maximized instead of minimized.
 This means that larger negative MAE are better and a perfect model has a MAE of 0.
 '''
-'''
+
+
 max_score = 0
-X, y = data_predict_x, column4
+
 # TO SET PARAMETERS
-max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
+'''max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
 max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
-n_estimator = np.array([10,50,100, 200, 300, 400, 500]) # sdet tp 100 by default
-max_depth = np.array([None,1,2,3,4,5,6,7])
+n_estimator = np.array([10, 50, 100, 200, 300, 400, 500]) # sdet tp 100 by default
+max_depth = np.array([None,1,2,3,4,5,6,7])'''
+
+# TESTS
+
+max_sample = np.array([0.1, 0.2])
+max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
+n_estimator = np.array([100, 200]) # sdet tp 100 by default
+max_depth = np.array([None,1,2])
 
 for max_samp in max_sample :
     for max_feat in max_feature :
@@ -258,7 +361,7 @@ for max_samp in max_sample :
             for n in n_estimator :
                 model = RandomForestRegressor(max_samples = max_samp, max_features = max_feat, n_estimators = n, max_depth = max_dep)
                 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-                n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+                n_scores = cross_val_score(model, X_train_app, y_train_app1, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
                 if mean(n_scores) < max_score :
                     max_score = mean(n_scores)
                     best_n_est = n
@@ -276,15 +379,16 @@ print("best max_depth : ")
 print(best_max_depth)
 
 print("results cross-validation error w/ best parameters : ")
-X, y = data_predict_x, column4
+# X, y = data_predict_x, column4
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+n_scores = cross_val_score(model, X_train_app, y_train_app1, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 print('MAE: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
 
 print("prediciton...")
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
-model.fit(X_train, y_train)
+model.fit(X_train_app, y_train_app1)
+'''
 y_test_pred = model.predict(X_test)
 mean_sq_err = mean_squared_error(y_test_pred, y_test)
 print("Mean squared error : ")
