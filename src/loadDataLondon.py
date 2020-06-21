@@ -9,7 +9,7 @@ print("-------------------------- MERGE DATAS  --------------------------")
 
 stations = ['BL0', 'BX1', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HR1', 'HV1', 'KC1', 'KF1', 'LH0', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
 for s in stations :
-    print(s)
+    print('Station : ', s)
     all = pd.read_csv('../final_project_data/merge/'+s+'.csv')
     print(all.shape)
     if s == 'CT2' :
