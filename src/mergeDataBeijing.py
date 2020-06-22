@@ -213,4 +213,8 @@ for station in Beijing_AirQuality_Stations_en_csv_formated['stationId']:
     merge_file =pd.merge(left=station_aqi_forecast, right=station_meo_grid, left_on='utc_time', right_on='utc_time')
     merge_file = merge_file.interpolate(method ='linear')
     merge_file = merge_file.fillna(merge_file.mean())
+
+    merge_final_corr_mat= merge_file.corr()
+    print(merge_final_corr_mat[:][0:5])
+
     merge_file.to_csv(r'../final_project_data/mergeBeijing/'+station+'.csv', index = False)

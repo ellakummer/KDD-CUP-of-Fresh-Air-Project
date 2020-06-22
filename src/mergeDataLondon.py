@@ -22,8 +22,7 @@ aqi_forecast = pd.read_csv('../final_project_data/London_historical_aqi_forecast
 
 aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
 aqi_forecast = aqi_forecast.fillna(aqi_forecast.mean())
-'''
->>>>>>> Stashed changes
+
 print("test shape aqi_forecast: ")
 print(aqi_forecast.shape)
 C_mat_aqi_forecast = aqi_forecast.corr()
@@ -63,7 +62,7 @@ print("")
 print(" -------------------- LOAD London_grid_weather_station")
 
 grid_stations = pd.read_csv('../final_project_data/London_grid_weather_station.csv')
-'''
+
 print("test shape grid_stations: ")
 print(grid_stations.shape)
 print("Data grid_stations : ")
@@ -90,6 +89,7 @@ print(meo_grid)
 print("")
 print("-------------------------- MERGE DATAS  --------------------------")
 for station in airQuality_stations['id']:
+
     print("Station : ")
     print(station)
 
@@ -97,36 +97,46 @@ for station in airQuality_stations['id']:
 
     #station_aqi_forecast <- id YYY
     station_aqi_forecast = aqi_forecast.loc[aqi_forecast['station_id']==station,:]
+    '''
     print("station_aqi_forecast : ")
     print(station_aqi_forecast)
+    '''
 
     station_aqi_other = aqi_other.loc[aqi_other['station_id']==station,:]
+    '''
     print("station_aqi_other : ")
     print(station_aqi_other)
+    '''
 
     #station_grid_stations : id YYY --> id london_grid_XX (w/ longitude + latitude)
     longitude_station = float(f"{station_airQuality_station['Longitude'].values[0]:.1f}")
     latitude_station = float(f"{station_airQuality_station['Latitude'].values[0]:.1f}")
+    '''
     print("longitude station : ")
     print(longitude_station)
     print("latitude station : ")
     print(latitude_station)
+    '''
 
     station_grid_station = grid_stations.loc[grid_stations['longitude']==longitude_station,:].loc[grid_stations['latitude']==latitude_station,:]['stationName'].values[0]
+    '''
     print("station_grid_station id : ")
     print(station_grid_station)
+    '''
 
     #station_meo_grid <- id london_grid_XX
     station_meo_grid = meo_grid.loc[meo_grid['stationName']==station_grid_station,:]
+    '''
     print("station_meo_grid: ")
     print(station_meo_grid)
-
+    '''
+    '''
     print("MERGE")
 
     print(station_aqi_forecast.columns)
     print(station_aqi_other.columns)
     print(station_meo_grid.columns)
-
+    '''
     if station_aqi_forecast.empty :
         station_merge =pd.merge(left=station_aqi_other, right=station_meo_grid, left_on='utc_time', right_on='utc_time')
     else :
@@ -141,5 +151,5 @@ for station in airQuality_stations['id']:
     # SAVE csv :
     station_merge.to_csv(r'../final_project_data/merge/'+station+'.csv', index = False)
 
-    merge_final_corr_mat= merge_file.corr()
-    print(merge_final_corr_mat[:][0:5])
+    merge_final_corr_mat= station_merge.corr()
+    print(merge_final_corr_mat[0:2][:])

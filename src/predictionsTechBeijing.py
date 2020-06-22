@@ -78,18 +78,22 @@ from mpl_toolkits import mplot3d
 
 print("----------- LOAD DATAS ------------")
 
-X_train = np.empty([200,3,11])
+X_train_O3 = np.empty([200,3,9])
+X_train_PM = np.empty([200,3,9])
 #X_train_app = np.empty([198,33])
-X_train_app = np.empty([200,11])
+X_train_app_O3 = np.empty([200,9])
+X_train_app_PM = np.empty([200,9])
 
 y_train = np.empty([200,3])
 y_train_app1 = np.empty([200])
 y_train_app2 = np.empty([200])
 y_train_app3 = np.empty([200])
 
-X_val = np.empty([100,3,11])
+X_val_O3 = np.empty([100,3,9])
+X_val_PM = np.empty([100,3,9])
 #X_val_app = np.empty([100,33])
-X_val_app = np.empty([100,11])
+X_val_app_O3 = np.empty([100,9])
+X_val_app_PM = np.empty([100,9])
 
 y_val = np.empty([100,3])
 y_val_app1 = np.empty([100])
@@ -106,7 +110,7 @@ stationsStart3 = ['pinggu']
 stationsStart4 = ['mentougou']
 stationsStart5 = ['tongzhou','huairou','fengtaihuayuan']
 stationsStart6 = ['fangshan']
-stations = ['dongsi'] # pick one for test
+#stations = ['dongsi'] # pick one for test
 for s in stations :
     #print(s)
     all = pd.read_csv('../final_project_data/mergeBeijing/'+s+'.csv')
@@ -131,10 +135,19 @@ for s in stations :
         endDateTest = 9420
 
     # SI ON VEUT CONCAT : SEPARER SELECTION ET NUMPY
-    X_test = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+    X_test_O3 = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+    X_test_PMs = all.loc[startDateTest:endDateTest,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     y_test = all.loc[startDateTest:endDateTest,['PM2.5','PM10','O3']].to_numpy()
-    X = all[['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+    y_test_PM25 = y_test[:,0]
+    y_test_PM10 = y_test[:,1]
+    y_test_O3 = y_test[:,2]
+
+    X_O3 = all[['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+    X_PM = all[['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     y = all[['PM2.5','PM10','O3']].to_numpy()
+    y_PM5 = y[:,0]
+    y_PM10 = y[:,1]
+    y_O3 = y[:,2]
     '''
     print(X_test[0])
     print(X_test[-1])
@@ -144,7 +157,8 @@ for s in stations :
     print(y[0])
     '''
     # OPTION 1 : DECALER EN JOURs
-    X_train1, X_val1 = X[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
+    X_train1_03, X_val1_03 = X_O3[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
+    X_train1_PM, X_val1_PM = X_PM[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
     y_train1, y_val1 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
     '''
     print(X_train1[0])
@@ -158,7 +172,8 @@ for s in stations :
     print(y_val1.shape)
     '''
     # OPTION 2 : DECALER EN HEURE
-    X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    X_train2_O3, X_val2_O3 = X_O3[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    X_train2_PM, X_val2_PM = X_PM[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
     y_train2, y_val2 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
     '''
     print(X_train2[0])
@@ -171,8 +186,10 @@ for s in stations :
     print(y_val2.shape)
     '''
     # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
-    X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
-    X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    X_train3_O3 = np.array([np.array([ X_O3[i],X_O3[i+1],X_O3[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_train3_PM = np.array([np.array([ X_PM[i],X_PM[i+1],X_PM[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val3_O3 = np.array([np.array([ X_O3[i],X_O3[i+1],X_O3[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    X_val3_PM = np.array([np.array([ X_PM[i],X_PM[i+1],X_PM[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     y_train3, y_val3 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
     '''
     print(X_train3[0])
@@ -187,11 +204,15 @@ for s in stations :
     print(y_val3[0])
     '''
     '''
-    X_train4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
-    X_val4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    X_train4_O3 = np.array([np.append( X_O3[i],np.append(X_O3[i+1],X_O3[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4_O3 = np.array([np.append( X_O3[i],np.append(X_O3[i+1],X_O3[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    X_val4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    X_train4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     '''
-    X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
-    X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    X_train4_PM = np.array([X_PM[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4_PM = np.array([X_PM[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    X_val4_O3 = np.array([X_O3[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    X_train4_O3 = np.array([X_O3[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
 
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
     y_train5, y_val5 = y[startDateTest-300:startDateTest-100,2], y[startDateTest-100:startDateTest,1]
@@ -209,7 +230,7 @@ for s in stations :
     print(X_val4[0])
     '''
 
-    #print("concat option3 : ")
+    # concat
     X_train = np.append(X_train, X_train3,axis=0)
     X_train_app = np.append(X_train_app, X_train4,axis=0)
     y_train = np.append(y_train, y_train3,axis=0)
@@ -222,13 +243,31 @@ for s in stations :
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
     y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
-    '''
-    x = range(len(y_train6))
-    y = y_train6
+
+    x = range(len(np.append(y_train6,y_val6)))
+    y = np.append(y_train6,y_val6)
     plt.plot(x,y)
     plt.xlabel('utc_time')
-    plt.ylabel('2.5PM Level')
-    plt.title('2.5PM from data training : '+ s)
+    plt.ylabel('O3 Level')
+    plt.title('O3 from data training : '+ s)
+    plt.show()
+
+    '''
+    x = range(len(y_test_PM25))
+    y = y_test_PM25
+    plt.plot(x,y)
+    plt.xlabel('utc_time')
+    plt.ylabel('PM2.5 Level')
+    plt.title('PM10 test: '+ s)
+    plt.show()
+    '''
+    '''
+    x = range(len(y_O3))
+    y = y_O3
+    plt.plot(x,y)
+    plt.xlabel('utc_time')
+    plt.ylabel('O3 Level')
+    plt.title('O3 all: '+ s)
     plt.show()
     '''
 
