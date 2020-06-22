@@ -35,6 +35,7 @@ from sklearn.metrics import log_loss
 
 from sklearn.linear_model import LinearRegression
 
+
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -49,6 +50,11 @@ warnings.filterwarnings('ignore')
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 #from xgboost import XGBRegressor
 '''
+
+from sklearn.neural_network import MLPRegressor
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+
 # tests
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
@@ -338,22 +344,25 @@ of the model across all repeats and folds. The scikit-learn library makes the
 MAE negative so that it is maximized instead of minimized.
 This means that larger negative MAE are better and a perfect model has a MAE of 0.
 '''
-
+'''
 
 max_score = 0
 
 # TO SET PARAMETERS
-'''max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
+max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
 max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
 n_estimator = np.array([10, 50, 100, 200, 300, 400, 500]) # sdet tp 100 by default
-max_depth = np.array([None,1,2,3,4,5,6,7])'''
+max_depth = np.array([None,1,2,3,4,5,6,7])
 
 # TESTS
 
+'''
 max_sample = np.array([0.1, 0.2])
 max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
 n_estimator = np.array([100, 200]) # sdet tp 100 by default
 max_depth = np.array([None,1,2])
+'''
+
 
 for max_samp in max_sample :
     for max_feat in max_feature :
@@ -361,7 +370,7 @@ for max_samp in max_sample :
             for n in n_estimator :
                 model = RandomForestRegressor(max_samples = max_samp, max_features = max_feat, n_estimators = n, max_depth = max_dep)
                 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-                n_scores = cross_val_score(model, X_train_app, y_train_app1, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+                n_scores = cross_val_score(model, X_train_app, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
                 if mean(n_scores) < max_score :
                     max_score = mean(n_scores)
                     best_n_est = n
@@ -382,12 +391,20 @@ print("results cross-validation error w/ best parameters : ")
 # X, y = data_predict_x, column4
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-n_scores = cross_val_score(model, X_train_app, y_train_app1, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+n_scores = cross_val_score(model, X_train_app, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 print('MAE: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
+print(y_train_app2.shape)
+
+
 
 print("prediciton...")
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
-model.fit(X_train_app, y_train_app1)
+model.fit(X_train_app, y_train_app2)
+pred = model.predict(X_val_app)
+
+print('predicted :', pred[:20])
+print('real : ', y_val_app2)
+'''
 '''
 y_test_pred = model.predict(X_test)
 mean_sq_err = mean_squared_error(y_test_pred, y_test)
@@ -433,19 +450,20 @@ df.head()
 X = df.fillna(df.mean()) # combined X = df, X = X.fillna(X.mean())
 y = target_df.fillna(target_df.mean())
 X = X.to_numpy()
-y = y.to_numpy()
+y = y.to_numpy()'''
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
 # set model : OVER CONSTRAINT, LAM, SPLINES
-gam = LinearGAM(n_splines=10).gridsearch(X_train, y_train)
+gam = LinearGAM(n_splines=10).gridsearch(X_train_app, y_train_app2)
 #gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
 #gam.summary()
 
 #prediction :
-predictions = gam.predict(X_test)
-print("Mean squared error: {} over {} samples".format(mean_squared_error(y_test, predictions), y.shape[0]))
+predictions = gam.predict(X_val_app)
+print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app2, predictions), y.shape[0]))
 
+'''
 print("y test : ")
 print(y_test)
 print("predictions : ")
@@ -483,6 +501,24 @@ for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
 '''
+'''
+error = 10000
+
+max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
+
+for it in max_iter:
+    #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
+    regr = MLPRegressor(max_iter = it).fit(X_train_app, y_train_app1)
+    err = mean_squared_error(y_val_app1, regr.predict(X_val_app))
+    if (err < error):
+        error = err
+        best_it = it
+
+
+print('Best min error : ', error)
+print('best it : ', best_it)
+'''
+
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
 
