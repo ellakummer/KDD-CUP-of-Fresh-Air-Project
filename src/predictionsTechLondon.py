@@ -101,8 +101,11 @@ y_val = np.empty([100,2])
 # y_train_app2 = np.empty([198])
 # y_train_app3 = np.empty([198])
 X_train = np.empty([200,3,8])
+X_train_reduc = np.empty([200,3,3])
+
 # X_train_app = np.empty([200,24])
 X_train_app = np.empty([200,8])
+X_train_app_reduc = np.empty([200,3])
 
 y_train = np.empty([200,2])
 y_train_app1 = np.empty([200])
@@ -110,8 +113,10 @@ y_train_app2 = np.empty([200])
 y_train_app3 = np.empty([200])
 
 X_val = np.empty([100,3,8])
+X_val_reduc = np.empty([100,3,3])
 # X_val_app = np.empty([100,24])
 X_val_app = np.empty([100,8])
+X_val_app_reduc = np.empty([100,3])
 
 y_val = np.empty([100,2])
 y_val_app1 = np.empty([100])
@@ -137,6 +142,7 @@ for s in stations :
     #y_test = all.loc[startDateTest:endDateTest,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     # X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)', 'utc_time']].to_numpy()
     X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    X_reduc = all[['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     y = all[['PM2.5 (ug-m3)','PM10 (ug-m3)']].to_numpy()
     # print('shape y : ', y.shape)
 
@@ -146,6 +152,7 @@ for s in stations :
     # y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
 
     X_train1, X_val1 = X[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
+    X_train1_reduc, X_val1_reduc = X_reduc[startDateTest-300-days*24:startDateTest-100-days*24], X_reduc[startDateTest-100-days*24:startDateTest-days*24]
     y_train1, y_val1 = X[startDateTest-300:startDateTest-100], X[startDateTest-100:startDateTest]
     '''
     print('X_train1[0] : ', X_train1[0])
@@ -171,6 +178,7 @@ for s in stations :
     # y_train2, y_val2 = y[1:201], y[201:301]
 
     X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    X_train2_reduc, X_val2_reduc = X_reduc[startDateTest-300-1:startDateTest-100-1], X_reduc[startDateTest-100-1:startDateTest-1]
     y_train2, y_val2 = X[startDateTest-300:startDateTest-100], X[startDateTest-100:startDateTest]
     '''
     print('X_train2[0] : ', X_train2[0])
@@ -208,11 +216,18 @@ for s in stations :
 
 
     X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_train3_reduc = np.array([np.array([ X_reduc[i],X_reduc[i+1],X_reduc[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+
     X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    X_val3_reduc = np.array([np.array([ X_reduc[i],X_reduc[i+1],X_reduc[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+
     y_train3, y_val3 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
 
     X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
+    X_train4_reduc = np.array([X_reduc[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
+
     X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    X_val4_reduc = np.array([X_reduc[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
 
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
     y_train5, y_val5 = y[startDateTest-300:startDateTest-100,1], y[startDateTest-100:startDateTest,1]
@@ -232,17 +247,27 @@ for s in stations :
     X_val = np.append(X_val, X_val3,axis=0)
     y_val = np.append(y_val, y_val3,axis=0)
     '''
-
-    print(X_train_app.shape)
-    print(X_train4.shape)
+    #
+    # print(X_train_app.shape)
+    # print(X_train4.shape)
     X_train = np.append(X_train, X_train3,axis=0)
+    X_train_reduc = np.append(X_train_reduc, X_train3_reduc,axis=0)
+
     X_train_app = np.append(X_train_app, X_train4,axis=0)
+    X_train_app_reduc = np.append(X_train_app_reduc, X_train4_reduc,axis=0)
+
     y_train = np.append(y_train, y_train3,axis=0)
     y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
     y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
     #y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
+
+
     X_val = np.append(X_val, X_val3,axis=0)
+    X_val_reduc = np.append(X_val_reduc, X_val3_reduc,axis=0)
+
     X_val_app = np.append(X_val_app, X_val4,axis=0)
+    X_val_app_reduc = np.append(X_val_app_reduc, X_val4_reduc,axis=0)
+
     y_val = np.append(y_val, y_val3,axis=0)
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
@@ -265,40 +290,60 @@ y_val = y_val[100:]
 '''
 
 #print("final matrix : ")
-X_train = X_train[198:]
-X_train_app = X_train_app[198:]
+# X_train = X_train[198:]
+# X_train_app = X_train_app[198:]
+#
+# y_train = y_train[198:]
+# y_train_app1 = y_train_app1[198:]
+# y_train_app2 = y_train_app2[198:]
+# #y_train_app3 = y_train_app3[198:]
 
-y_train = y_train[198:]
-y_train_app1 = y_train_app1[198:]
-y_train_app2 = y_train_app2[198:]
-#y_train_app3 = y_train_app3[198:]
+X_train = X_train[200:]
+X_train_reduc = X_train_reduc[200:]
+
+X_train_app = X_train_app[200:]
+X_train_app_reduc = X_train_app_reduc[200:]
+
+y_train = y_train[200:]
+y_train_app1 = y_train_app1[200:]
+y_train_app2 = y_train_app2[200:]
 
 X_val= X_val[100:]
+X_val_reduc = X_val_reduc[100:]
+
 X_val_app = X_val_app[100:]
+X_val_app_reduc = X_val_app_reduc[100:]
 
 y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
 #y_val_app3 = y_val_app3[100:]
 
+# print('shape X_train_app : ', X_train_app.shape)
+# print('shape y_train_app1 : ', y_train_app1.shape)
 
 print("----------- START TESTS : Linerar Regression ------------")
 
-'''
-X_train_l = X_train_app
-y_train_l = y_train_app1
+X_train_l = X_train_app_reduc
+y_train_l = y_train_app2
 #X_test_l = X_test
-X_val_l = X_val_app
-y_val_l = y_val_app1
+X_val_l = X_val_app_reduc
+y_val_l = y_val_app2
 
+# print(X_train_l)
+# for i in range(len(X_train_l)):
+#     print(X_train_l[i])
 
+'''
 reg = LinearRegression().fit(X_train_l,y_train_l)
 err = mean_squared_error(y_val_l,reg.predict(X_val_l))
+print('error : ', err)
+'''
 
 #pred = reg.predict(X_test_l)
 #print(pred)
 
-'''
+
 
 # COMPARER DEUX PLOTS :
 # Y_TEST REELS A PREDIRE
@@ -330,10 +375,10 @@ max_depths = np.array([1,2])
 for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
-            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
+            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app_reduc, y_train_app2)
             # make cross validation error
-            error = mean_squared_error(y_val_app2, est.predict(X_val_app))
-            print(error)
+            error = mean_squared_error(y_val_app2, est.predict(X_val_app_reduc))
+            #print(error)
             if error < min_error :
                 min_error = error
                 best_n_est = esti
@@ -349,8 +394,9 @@ print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
-pred = est.predict(X_test)
+'''
+# est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
+# pred = est.predict(X_test)
 
 # COMPARER DEUX PLOTS :
 # Y_TEST REELS A PREDIRE
@@ -362,12 +408,12 @@ pred = est.predict(X_test)
 #confusion_est = confusion_matrix(y_test,pred)
 #print(confusion_est)
 
+#
+# for i in range(10) :
+#     print("test : ", y_test[i])
+#     print("pred = ", pred[i])
+#
 
-for i in range(10) :
-    print("test : ", y_test[i])
-    print("pred = ", pred[i])
-
-'''
 # OR :
 '''
 # https://www.datacareer.ch/blog/parameter-tuning-in-gradient-boosting-gbm-with-python/
@@ -422,11 +468,13 @@ max_depth = np.array([None,1,2,3,4,5,6,7])
 # TESTS
 
 '''
+'''
 max_sample = np.array([0.1, 0.2])
 max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
 n_estimator = np.array([100, 200]) # sdet tp 100 by default
 max_depth = np.array([None,1,2])
-'''
+
+max_score = 0
 
 
 for max_samp in max_sample :
@@ -435,7 +483,7 @@ for max_samp in max_sample :
             for n in n_estimator :
                 model = RandomForestRegressor(max_samples = max_samp, max_features = max_feat, n_estimators = n, max_depth = max_dep)
                 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-                n_scores = cross_val_score(model, X_train_app, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+                n_scores = cross_val_score(model, X_train_app_reduc, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
                 if mean(n_scores) < max_score :
                     max_score = mean(n_scores)
                     best_n_est = n
@@ -456,20 +504,21 @@ print("results cross-validation error w/ best parameters : ")
 # X, y = data_predict_x, column4
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-n_scores = cross_val_score(model, X_train_app, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+n_scores = cross_val_score(model, X_train_app_reduc, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 print('MAE: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
-print(y_train_app2.shape)
+# print(y_train_app1.shape)
 
 
 
 print("prediciton...")
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
-model.fit(X_train_app, y_train_app2)
-pred = model.predict(X_val_app)
-
+model.fit(X_train_app_reduc, y_train_app2)
+pred = model.predict(X_val_app_reduc)
+#
 print('predicted :', pred[:20])
 print('real : ', y_val_app2)
 '''
+
 '''
 y_test_pred = model.predict(X_test)
 mean_sq_err = mean_squared_error(y_test_pred, y_test)
@@ -518,19 +567,20 @@ X = X.to_numpy()
 y = y.to_numpy()
 
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-
+'''
+'''
 # set model : OVER CONSTRAINT, LAM, SPLINES
-gam = LinearGAM(n_splines=10).gridsearch(X_train_app, y_train_app2)
+gam = LinearGAM(n_splines=10).gridsearch(X_train_app_reduc, y_train_app2)
 #gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
 #gam.summary()
 
 #prediction :
-predictions = gam.predict(X_val_app)
-print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app2, predictions), y.shape[0]))
+predictions = gam.predict(X_val_app_reduc)
+print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app1, predictions), y.shape[0]))
 
 
-print("y test : ")
-print(y_test)
+print("y val real : ")
+print(y_val_app2)
 print("predictions : ")
 print(predictions)
 '''
@@ -566,17 +616,17 @@ for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
 '''
-'''
+
 error = 10000
 
-max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
+max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
 activation = ['identity', 'logistic', 'tanh', 'relu']
 
 for it in max_iter:
     for acti in activation:
         #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
-        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app, y_train_app2)
-        err = mean_squared_error(y_val_app2, regr.predict(X_val_app))
+        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app_reduc, y_train_app2)
+        err = mean_squared_error(y_val_app2, regr.predict(X_val_app_reduc))
         if (err < error):
             error = err
             best_it = it
@@ -586,7 +636,7 @@ for it in max_iter:
 print('Best min error : ', error)
 print('best it : ', best_it)
 print('best acti : ', best_acti)
-'''
+
 
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
