@@ -15,12 +15,11 @@ print("------------------------------ LOAD DATA  ------------------------------"
 print(" -------------------- LOAD London_historical_aqi_forecast_stations_20180331")
 
 aqi_forecast = pd.read_csv('../final_project_data/London_historical_aqi_forecast_stations_20180331_ordered.csv')
-<<<<<<< Updated upstream
+
 #aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
 # aqi_forecast = aqi_forecast.interpolate(method ='linear')
 # aqi_forecast = aqi_forecast.fillna(aqi_forecast.mean())
 
-=======
 aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
 aqi_forecast = aqi_forecast.fillna(aqi_forecast.mean())
 '''
@@ -69,7 +68,7 @@ print("test shape grid_stations: ")
 print(grid_stations.shape)
 print("Data grid_stations : ")
 print(grid_stations)
-'''
+
 print("")
 # ------- LOAD London_historical_meo_grid ------
 print(" -------------------- LOAD London_historical_meo_grid")
@@ -86,6 +85,7 @@ C_mat_meo_grid = meo_grid.corr()
 print(C_mat_meo_grid)
 print("Data meo_grid : ")
 print(meo_grid)
+
 
 print("")
 print("-------------------------- MERGE DATAS  --------------------------")
@@ -140,3 +140,6 @@ for station in airQuality_stations['id']:
 
     # SAVE csv :
     station_merge.to_csv(r'../final_project_data/merge/'+station+'.csv', index = False)
+
+    merge_final_corr_mat= merge_file.corr()
+    print(merge_final_corr_mat[:][0:5])

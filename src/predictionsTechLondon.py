@@ -93,16 +93,25 @@ X_val = np.empty([100,3,8])
 y_val = np.empty([100,2])
 '''
 
-X_train = np.empty([198,3,8])
-X_train_app = np.empty([198,24])
+# X_train = np.empty([198,3,8])
+# X_train_app = np.empty([198,24])
+#
+# y_train = np.empty([198,2])
+# y_train_app1 = np.empty([198])
+# y_train_app2 = np.empty([198])
+# y_train_app3 = np.empty([198])
+X_train = np.empty([200,3,8])
+# X_train_app = np.empty([200,24])
+X_train_app = np.empty([200,8])
 
-y_train = np.empty([198,2])
-y_train_app1 = np.empty([198])
-y_train_app2 = np.empty([198])
-y_train_app3 = np.empty([198])
+y_train = np.empty([200,2])
+y_train_app1 = np.empty([200])
+y_train_app2 = np.empty([200])
+y_train_app3 = np.empty([200])
 
 X_val = np.empty([100,3,8])
-X_val_app = np.empty([100,24])
+# X_val_app = np.empty([100,24])
+X_val_app = np.empty([100,8])
 
 y_val = np.empty([100,2])
 y_val_app1 = np.empty([100])
@@ -110,30 +119,45 @@ y_val_app2 = np.empty([100])
 y_val_app3 = np.empty([100])
 
 days = 2
-stations = ['BL0', 'BX1', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HR1', 'HV1', 'KC1', 'KF1', 'LH0', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
-#stations = ['BL0'] # pick one
+# stations = ['BL0', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HV1', 'KF1', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
+stations = ['BL0', 'CD1', 'CD9', 'GN0', 'GN3', 'GR4', 'GR9', 'HV1', 'KF1', 'LW2', 'MY7', 'ST5', 'TH4']
+# stations = ['BL0'] # pick one
 for s in stations :
     #print(s)
     all = pd.read_csv('../final_project_data/merge/'+s+'.csv')
     #print(all.shape)
     if s == 'CT2' :
-        startDate = 9240
-        endDate = 9287
+        startDateTest = 9240
+        endDateTest = 9287
     else :
-        startDate = 10656
-        endDate = 10703
+        startDateTest = 10656
+        endDateTest = 10703
     # SEE YOU LATER TESTS :)
-    #X_test = all.loc[startDate:endDate,['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
-    #y_test = all.loc[startDate:endDate,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    #X_test = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    #y_test = all.loc[startDateTest:endDateTest,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
+    # X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)', 'utc_time']].to_numpy()
     X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     y = all[['PM2.5 (ug-m3)','PM10 (ug-m3)']].to_numpy()
+    # print('shape y : ', y.shape)
 
 
     # OPTION 1 : DECALER EN JOURs
-    X_train1, X_val1 = X[:200], X[200:300]
-    y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
+    # X_train1, X_val1 = X[:200], X[200:300]
+    # y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
 
+    X_train1, X_val1 = X[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
+    y_train1, y_val1 = X[startDateTest-300:startDateTest-100], X[startDateTest-100:startDateTest]
     '''
+    print('X_train1[0] : ', X_train1[0])
+    print('X_train1[last] : ', X_train1[-1])
+    print('X_val1[0] : ', X_val1[0])
+    print('X_val1[last] : ', X_val1[-1])
+    print('y_train1[0] : ', y_train1[0])
+    print('y_train1[last] : ', y_train1[-1])
+    print('y_val1[0] : ', y_val1[0])
+    print('y_val1[last] : ', y_val1[-1])
+
+
     print("option 1 : ")
     print(X_train1.shape)
     print(y_train1.shape)
@@ -143,9 +167,21 @@ for s in stations :
 
     # OPTION 2 : DECALER EN HEURE
     #print("option 2 : ")
-    X_train2, X_val2 = X[:200], X[200:300]
-    y_train2, y_val2 = y[1:201], y[201:301]
+    # X_train2, X_val2 = X[:200], X[200:300]
+    # y_train2, y_val2 = y[1:201], y[201:301]
+
+    X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    y_train2, y_val2 = X[startDateTest-300:startDateTest-100], X[startDateTest-100:startDateTest]
     '''
+    print('X_train2[0] : ', X_train2[0])
+    print('X_train2[last] : ', X_train2[-1])
+    print('X_val2[0] : ', X_val2[0])
+    print('X_val2[last] : ', X_val2[-1])
+    print('y_train2[0] : ', y_train2[0])
+    print('y_train2[last] : ', y_train2[-1])
+    print('y_val2[0] : ', y_val2[0])
+    print('y_val2[last] : ', y_val2[-1])
+
     print(X_train2.shape)
     print(y_train2.shape)
     print(X_val2.shape)
@@ -153,13 +189,34 @@ for s in stations :
     '''
     # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
     #print("option 3 : ")
-    X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
-    X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
-    y_train3, y_val3 = y[3:201], y[201:301]
-    X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
-    X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
-    y_train4,y_val4 = y[3:201,0], y[201:301,0]
-    y_train5,y_val5 = y[3:201,1], y[201:301,1]
+    # X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
+    # X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
+    # y_train3, y_val3 = y[3:201], y[201:301]
+    # X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
+    # X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
+    # y_train4,y_val4 = y[3:201,0], y[201:301,0]
+    # y_train5,y_val5 = y[3:201,1], y[201:301,1]
+
+    # X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
+    # X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
+    # y_train3, y_val3 = y[3:201], y[201:301]
+
+    # X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
+    # X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
+    # y_train4,y_val4 = y[3:201,0], y[201:301,0]
+    # y_train5,y_val5 = y[3:201,1], y[201:301,1]
+
+
+    X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
+    y_train3, y_val3 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
+
+    X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+
+    y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
+    y_train5, y_val5 = y[startDateTest-300:startDateTest-100,1], y[startDateTest-100:startDateTest,1]
+
 
     '''
     print(X_train3[0])
@@ -176,8 +233,8 @@ for s in stations :
     y_val = np.append(y_val, y_val3,axis=0)
     '''
 
-    #print(y_train.shape)
-    #print(y_train3.shape)
+    print(X_train_app.shape)
+    print(X_train4.shape)
     X_train = np.append(X_train, X_train3,axis=0)
     X_train_app = np.append(X_train_app, X_train4,axis=0)
     y_train = np.append(y_train, y_train3,axis=0)
@@ -190,6 +247,14 @@ for s in stations :
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
     #y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
+
+    # x = range(len(y_train5))
+    # y = y_train5
+    # plt.plot(x,y)
+    # plt.xlabel('utc_time')
+    # plt.ylabel('2.5PM Level')
+    # plt.title('2.5PM from data training : '+ s)
+    # plt.show()
 
 '''
 print("final matrix : ")
@@ -501,7 +566,7 @@ for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
 '''
-
+'''
 error = 10000
 
 max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
@@ -521,7 +586,7 @@ for it in max_iter:
 print('Best min error : ', error)
 print('best it : ', best_it)
 print('best acti : ', best_acti)
-
+'''
 
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
