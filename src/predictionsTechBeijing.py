@@ -78,9 +78,11 @@ from mpl_toolkits import mplot3d
 
 print("----------- LOAD DATAS ------------")
 
+X_train = np.empty([200,3,11])
 X_train_O3 = np.empty([200,3,9])
 X_train_PM = np.empty([200,3,9])
 #X_train_app = np.empty([198,33])
+X_train_app = np.empty([200,11])
 X_train_app_O3 = np.empty([200,9])
 X_train_app_PM = np.empty([200,9])
 
@@ -89,9 +91,11 @@ y_train_app1 = np.empty([200])
 y_train_app2 = np.empty([200])
 y_train_app3 = np.empty([200])
 
+X_val = np.empty([100,3,11])
 X_val_O3 = np.empty([100,3,9])
 X_val_PM = np.empty([100,3,9])
 #X_val_app = np.empty([100,33])
+X_val_app = np.empty([100,11])
 X_val_app_O3 = np.empty([100,9])
 X_val_app_PM = np.empty([100,9])
 
@@ -135,6 +139,7 @@ for s in stations :
         endDateTest = 9420
 
     # SI ON VEUT CONCAT : SEPARER SELECTION ET NUMPY
+    X_test = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     X_test_O3 = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
     X_test_PMs = all.loc[startDateTest:endDateTest,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     y_test = all.loc[startDateTest:endDateTest,['PM2.5','PM10','O3']].to_numpy()
@@ -142,6 +147,7 @@ for s in stations :
     y_test_PM10 = y_test[:,1]
     y_test_O3 = y_test[:,2]
 
+    X = all[['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     X_O3 = all[['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
     X_PM = all[['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     y = all[['PM2.5','PM10','O3']].to_numpy()
@@ -157,8 +163,9 @@ for s in stations :
     print(y[0])
     '''
     # OPTION 1 : DECALER EN JOURs
-    X_train1_03, X_val1_03 = X_O3[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
-    X_train1_PM, X_val1_PM = X_PM[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
+    X_train1, X_val1 = X[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
+    X_train1_03, X_val1_03 = X_O3[startDateTest-300-days*24:startDateTest-100-days*24], X_O3[startDateTest-100-days*24:startDateTest-days*24]
+    X_train1_PM, X_val1_PM = X_PM[startDateTest-300-days*24:startDateTest-100-days*24], X_O3[startDateTest-100-days*24:startDateTest-days*24]
     y_train1, y_val1 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
     '''
     print(X_train1[0])
@@ -172,8 +179,9 @@ for s in stations :
     print(y_val1.shape)
     '''
     # OPTION 2 : DECALER EN HEURE
-    X_train2_O3, X_val2_O3 = X_O3[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
-    X_train2_PM, X_val2_PM = X_PM[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    X_train2_O3, X_val2_O3 = X_O3[startDateTest-300-1:startDateTest-100-1], X_O3[startDateTest-100-1:startDateTest-1]
+    X_train2_PM, X_val2_PM = X_PM[startDateTest-300-1:startDateTest-100-1], X_PM[startDateTest-100-1:startDateTest-1]
     y_train2, y_val2 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
     '''
     print(X_train2[0])
@@ -186,8 +194,10 @@ for s in stations :
     print(y_val2.shape)
     '''
     # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
+    X_train3= np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_O3 = np.array([np.array([ X_O3[i],X_O3[i+1],X_O3[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_PM = np.array([np.array([ X_PM[i],X_PM[i+1],X_PM[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_val3_O3 = np.array([np.array([ X_O3[i],X_O3[i+1],X_O3[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_val3_PM = np.array([np.array([ X_PM[i],X_PM[i+1],X_PM[i+2]])for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     y_train3, y_val3 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
@@ -204,15 +214,19 @@ for s in stations :
     print(y_val3[0])
     '''
     '''
+    X_train4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)])
     X_train4_O3 = np.array([np.append( X_O3[i],np.append(X_O3[i+1],X_O3[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_val4_O3 = np.array([np.append( X_O3[i],np.append(X_O3[i+1],X_O3[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_val4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_train4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     '''
-    X_train4_PM = np.array([X_PM[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
+    X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    X_train4_PM = np.array([X_PM[i] for i in range(startDateTest-300-1,startDateTest-100-1)])
     X_val4_PM = np.array([X_PM[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    X_train4_O3 = np.array([X_O3[i] for i in range(startDateTest-300-1,startDateTest-100-1)])
     X_val4_O3 = np.array([X_O3[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
-    X_train4_O3 = np.array([X_O3[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
 
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
     y_train5, y_val5 = y[startDateTest-300:startDateTest-100,2], y[startDateTest-100:startDateTest,1]
@@ -231,23 +245,27 @@ for s in stations :
     '''
 
     # concat
+    X_train = np.append(X_train, X_train3,axis=0)
     X_train_O3 = np.append(X_train_O3, X_train3_O3,axis=0)
     X_train_PM = np.append(X_train_PM, X_train3_PM,axis=0)
+    X_train_app = np.append(X_train_app, X_train4,axis=0)
     X_train_app_O3 = np.append(X_train_app_O3, X_train4_O3,axis=0)
     X_train_app_PM = np.append(X_train_app_PM, X_train4_PM,axis=0)
     y_train = np.append(y_train, y_train3,axis=0)
     y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
     y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
     y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
+    X_val = np.append(X_val, X_val3,axis=0)
     X_val_O3 = np.append(X_val_O3, X_val3_O3,axis=0)
     X_val_PM = np.append(X_val_PM, X_val3_PM,axis=0)
+    X_val_app = np.append(X_val_app, X_val4,axis=0)
     X_val_app_O3 = np.append(X_val_app_O3, X_val4_O3,axis=0)
     X_val_app_PM = np.append(X_val_app_PM, X_val4_PM,axis=0)
     y_val = np.append(y_val, y_val3,axis=0)
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
     y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
-
+    '''
     x = range(len(np.append(y_train6,y_val6)))
     y = np.append(y_train6,y_val6)
     plt.plot(x,y)
@@ -255,6 +273,7 @@ for s in stations :
     plt.ylabel('O3 Level')
     plt.title('O3 from data training : '+ s)
     plt.show()
+    '''
 
     '''
     x = range(len(y_test_PM25))
@@ -276,8 +295,10 @@ for s in stations :
     '''
 
 print("final matrix : ")
+X_train = X_train[200:]
 X_train_O3 = X_train_O3[200:]
 X_train_PM = X_train_PM[200:]
+X_train_app = X_train_app[200:]
 X_train_app_O3 = X_train_app_O3[200:]
 X_train_app_PM = X_train_app_PM[200:]
 
@@ -286,8 +307,10 @@ y_train_app1 = y_train_app1[200:]
 y_train_app2 = y_train_app2[200:]
 y_train_app3 = y_train_app3[200:]
 
+X_val= X_val[100:]
 X_val_O3= X_val_O3[100:]
 X_val_PM= X_val_PM[100:]
+X_val_app = X_val_app[100:]
 X_val_app_O3 = X_val_app_O3[100:]
 X_val_app_PM = X_val_app_PM[100:]
 
@@ -295,7 +318,7 @@ y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
 y_val_app3 = y_val_app3[100:]
-
+'''
 print(X_train_O3.shape)
 print(X_train_PM.shape)
 print(X_val_O3.shape)
@@ -311,22 +334,12 @@ print(y_val_app1.shape)
 print(y_val_app2.shape)
 print(y_val_app3.shape)
 '''
-x = range(len(y_train_app1))
-y = y_train_app1
-plt.plot(x,y)
-plt.xlabel('utc_time')
-plt.ylabel('PM2.5 Level')
-plt.title('PM2.5 from data training')
-plt.show()
-'''
-
-
 print("----------- START TESTS : Linerar Regression ------------")
 '''
-X_train_l = X_train_app
+X_train_l = X_train_app_PM
 y_train_l = y_train_app1
 #X_test_l = X_test
-X_val_l = X_val_app
+X_val_l = X_val_app_PM
 y_val_l = y_val_app1
 
 
@@ -364,7 +377,7 @@ n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 '''
-'''
+
 n_est = np.array([50,100,150,200,250,300,350,400])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1])
 max_depths = np.array([1,2,3])
@@ -373,9 +386,9 @@ for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
             print('esti: ', esti, ' learning_rate : ', lr, ' depth : ', depth)
-            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
+            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app_PM, y_train_app2)
             # make cross validation error
-            error = mean_squared_error(y_val_app1, est.predict(X_val_app))
+            error = mean_squared_error(y_val_app2, est.predict(X_val_app_PM))
             #print(error)
             if error < min_error :
                 min_error = error
@@ -392,8 +405,8 @@ print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
-pred = est.predict(X_val_app) # CHANGE IN TEST
+est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app_PM, y_train_app2)
+pred = est.predict(X_val_app_PM) # CHANGE IN TEST
 
 # COMPARER DEUX PLOTS :
 # Y_TEST REELS A PREDIRE
@@ -407,10 +420,10 @@ pred = est.predict(X_val_app) # CHANGE IN TEST
 
 
 for i in range(10) :
-    print("test : ", y_val_app1[i])
+    print("test : ", y_val_app2[i])
     print("pred = ", pred[i])
 
-'''
+
 
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
@@ -556,11 +569,42 @@ plt.show()
 print("----------- END TESTS GAM ------------")
 
 print("----------- START TESTS Multiclass Neural Network  ------------")
+'''
+C_mat = data_predict_x.corr()
+fig = plt.figure(figsize = (15,15))
+'''
+'''
+for i in range(10) :
+    print("test : ", y_test[i])
+    print("pred = ", pred[i])
+'''
+'''
+error = 10000
+
+max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
+activation = ['identity', 'logistic', 'tanh', 'relu']
+
+for it in max_iter:
+    for acti in activation:
+        #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
+        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app, y_train_app2)
+        err = mean_squared_error(y_val_app2, regr.predict(X_val_app))
+        if (err < error):
+            error = err
+            best_it = it
+            best_acti = acti
+
+
+print('Best min error : ', error)
+print('best it : ', best_it)
+print('best acti : ', best_acti)
+'''
 print("----------- END TESTS Multiclass Neural Network  ------------")
 
 print("----------- START TESTS xgboost  ------------")
 # https://xgboost.readthedocs.io/en/latest/parameter.html
 # https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/
+# OPTION 1
 '''
 # read in data
 dtrain = xgb.DMatrix(X_train_app,label=y_train_app1bis)
@@ -577,6 +621,7 @@ for i in range(10):
     print(preds[i])
     print(y_val_app1[i])
 '''
+# OPTION 2
 '''
 seed = 123
 res = xgb.cv(xgb_params, dtrain, num_boost_round=1000, nfold=4, seed=seed, stratified=False,early_stopping_rounds=25, verbose_eval=10, show_stdv=True)
@@ -593,6 +638,36 @@ plt.ylabel('Predicted Sale Price')
 plt.plot([min(y_val_app1), max(y_val_app1)], [min(y_val_app1), max(y_val_app1)])
 plt.tight_layout()
 '''
+
+data_dmatrix = xgb.DMatrix(data=X,label=y)
+# OPTION 3
+'''
+xg_reg = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 10)
+xg_reg.fit(X_train,y_train)
+
+preds = xg_reg.predict(X_test)
+
+rmse = np.sqrt(mean_squared_error(y_test, preds))
+'''
+# OPTION4
+'''
+params = {"objective":"reg:linear",'colsample_bytree': 0.3,'learning_rate': 0.1,'max_depth': 5, 'alpha': 10}
+
+cv_results = xgb.cv(dtrain=data_dmatrix, params=params, nfold=3, num_boost_round=50,early_stopping_rounds=10,metrics="rmse", as_pandas=True, seed=123)
+
+print(cv_results.head())
+
+print((cv_results["test-rmse-mean"]).tail(1))
+'''
+# OPTION 5
+
+'''
+xg_reg = xgb.train(params=params, dtrain=data_dmatrix, num_boost_round=10)
+xgb.plot_tree(xg_reg,num_trees=0)
+plt.rcParams['figure.figsize'] = [50, 10]
+plt.show()
+'''
+
 print("----------- END TESTS xgboost  ------------")
 
 '''
