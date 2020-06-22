@@ -144,9 +144,10 @@ for station in airQuality_stations['id']:
 
     station_merge = station_merge.interpolate(method ='linear')
     station_merge = station_merge.fillna(station_merge.mean())
-
+    '''
     print(station_merge)
     print(station_merge.columns)
+    '''
 
     # SAVE csv :
     station_merge.to_csv(r'../final_project_data/merge/'+station+'.csv', index = False)

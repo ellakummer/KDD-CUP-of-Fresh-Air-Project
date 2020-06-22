@@ -231,14 +231,18 @@ for s in stations :
     '''
 
     # concat
-    X_train = np.append(X_train, X_train3,axis=0)
-    X_train_app = np.append(X_train_app, X_train4,axis=0)
+    X_train_O3 = np.append(X_train_O3, X_train3_O3,axis=0)
+    X_train_PM = np.append(X_train_PM, X_train3_PM,axis=0)
+    X_train_app_O3 = np.append(X_train_app_O3, X_train4_O3,axis=0)
+    X_train_app_PM = np.append(X_train_app_PM, X_train4_PM,axis=0)
     y_train = np.append(y_train, y_train3,axis=0)
     y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
     y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
     y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
-    X_val = np.append(X_val, X_val3,axis=0)
-    X_val_app = np.append(X_val_app, X_val4,axis=0)
+    X_val_O3 = np.append(X_val_O3, X_val3_O3,axis=0)
+    X_val_PM = np.append(X_val_PM, X_val3_PM,axis=0)
+    X_val_app_O3 = np.append(X_val_app_O3, X_val4_O3,axis=0)
+    X_val_app_PM = np.append(X_val_app_PM, X_val4_PM,axis=0)
     y_val = np.append(y_val, y_val3,axis=0)
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
@@ -272,26 +276,34 @@ for s in stations :
     '''
 
 print("final matrix : ")
-X_train = X_train[200:]
-X_train_app = X_train_app[200:]
+X_train_O3 = X_train_O3[200:]
+X_train_PM = X_train_PM[200:]
+X_train_app_O3 = X_train_app_O3[200:]
+X_train_app_PM = X_train_app_PM[200:]
 
 y_train = y_train[200:]
 y_train_app1 = y_train_app1[200:]
 y_train_app2 = y_train_app2[200:]
 y_train_app3 = y_train_app3[200:]
 
-X_val= X_val[100:]
-X_val_app = X_val_app[100:]
+X_val_O3= X_val_O3[100:]
+X_val_PM= X_val_PM[100:]
+X_val_app_O3 = X_val_app_O3[100:]
+X_val_app_PM = X_val_app_PM[100:]
 
 y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
 y_val_app3 = y_val_app3[100:]
 
-print(X_train.shape)
-print(X_val.shape)
-print(X_train_app.shape)
-print(X_val_app.shape)
+print(X_train_O3.shape)
+print(X_train_PM.shape)
+print(X_val_O3.shape)
+print(X_val_PM.shape)
+print(X_train_app_O3.shape)
+print(X_train_app_PM.shape)
+print(X_val_app_O3.shape)
+print(X_val_app_PM.shape)
 print(y_train_app1.shape)
 print(y_train_app2.shape)
 print(y_train_app3.shape)
