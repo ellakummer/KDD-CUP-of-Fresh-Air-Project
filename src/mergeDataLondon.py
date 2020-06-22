@@ -15,10 +15,16 @@ print("------------------------------ LOAD DATA  ------------------------------"
 print(" -------------------- LOAD London_historical_aqi_forecast_stations_20180331")
 
 aqi_forecast = pd.read_csv('../final_project_data/London_historical_aqi_forecast_stations_20180331_ordered.csv')
+<<<<<<< Updated upstream
 #aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
 # aqi_forecast = aqi_forecast.interpolate(method ='linear')
 # aqi_forecast = aqi_forecast.fillna(aqi_forecast.mean())
 
+=======
+aqi_forecast = aqi_forecast.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+aqi_forecast = aqi_forecast.fillna(aqi_forecast.mean())
+'''
+>>>>>>> Stashed changes
 print("test shape aqi_forecast: ")
 print(aqi_forecast.shape)
 C_mat_aqi_forecast = aqi_forecast.corr()

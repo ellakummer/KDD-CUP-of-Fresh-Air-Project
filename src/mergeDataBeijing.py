@@ -15,8 +15,9 @@ from mpl_toolkits import mplot3d
 print(" -------------------- LOAD beijing_17_18_aq")
 beijing_17_18_aq = pd.read_csv('../final_project_data/beijing_17_18_aq.csv')
 
-beijing_17_18_aq = beijing_17_18_aq.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
-beijing_17_18_aq = beijing_17_18_aq.fillna(beijing_17_18_aq.mean())
+#beijing_17_18_aq = beijing_17_18_aq.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+#beijing_17_18_aq = beijing_17_18_aq.interpolate(method ='linear')
+#beijing_17_18_aq = beijing_17_18_aq.fillna(beijing_17_18_aq.mean())
 
 print("test shape beijing_17_18_aq: ")
 print(beijing_17_18_aq.shape)
@@ -34,8 +35,9 @@ print("")
 print(" -------------------- LOAD beijing_201802_201803_aq")
 beijing_201802_201803_aq = pd.read_csv('../final_project_data/beijing_201802_201803_aq.csv')
 
-beijing_201802_201803_aq = beijing_201802_201803_aq.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
-beijing_201802_201803_aq = beijing_201802_201803_aq.fillna(beijing_201802_201803_aq.mean())
+#beijing_201802_201803_aq = beijing_201802_201803_aq.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+#beijing_201802_201803_aq = beijing_201802_201803_aq.interpolate(method ='linear')
+#beijing_201802_201803_aq = beijing_201802_201803_aq.fillna(beijing_201802_201803_aq.mean())
 
 print("test shape beijing_201802_201803_aq: ")
 print(beijing_201802_201803_aq.shape)
@@ -51,8 +53,9 @@ print("")
 print("-------------------- LOAD beijing_17_18_meo_cut")
 beijing_17_18_meo = pd.read_csv('../final_project_data/beijing_17_18_meo_cut.csv')
 
-beijing_17_18_meo = beijing_17_18_meo.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
-beijing_17_18_meo = beijing_17_18_meo.fillna(beijing_17_18_meo.mean())
+#beijing_17_18_meo = beijing_17_18_meo.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+#beijing_17_18_meo = beijing_17_18_meo.interpolate(method ='linear')
+#beijing_17_18_meo = beijing_17_18_meo.fillna(beijing_17_18_meo.mean())
 
 print("test shape beijing_17_18_meo: ")
 print(beijing_17_18_meo.shape)
@@ -71,8 +74,9 @@ beijing_201802_201803_me = pd.read_csv('../final_project_data/beijing_201802_201
 # remove duplicated lines 00:00:00
 beijing_201802_201803_me.drop_duplicates(subset =['station_id','utc_time'], keep = 'first', inplace = True)
 
-beijing_201802_201803_me = beijing_201802_201803_me.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
-beijing_201802_201803_me = beijing_201802_201803_me.fillna(beijing_201802_201803_me.mean())
+#beijing_201802_201803_me = beijing_201802_201803_me.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
+#beijing_201802_201803_me = beijing_201802_201803_me.interpolate(method ='linear')
+#beijing_201802_201803_me = beijing_201802_201803_me.fillna(beijing_201802_201803_me.mean())
 
 print("test shape beijing_201802_201803_me: ")
 print(beijing_201802_201803_me.shape)
@@ -207,4 +211,6 @@ for station in Beijing_AirQuality_Stations_en_csv_formated['stationId']:
         station_meo_grid = station_meo_grid.fillna(station_meo_grid.mean())
 
     merge_file =pd.merge(left=station_aqi_forecast, right=station_meo_grid, left_on='utc_time', right_on='utc_time')
+    merge_file = merge_file.interpolate(method ='linear')
+    merge_file = merge_file.fillna(merge_file.mean())
     merge_file.to_csv(r'../final_project_data/mergeBeijing/'+station+'.csv', index = False)

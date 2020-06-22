@@ -39,13 +39,15 @@ from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
 import seaborn as sb
-import warnings
-warnings.filterwarnings('ignore')
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-#from xgboost import XGBRegressor
 '''
+#for xgboost
+import xgboost as xgb
+from xgboost import XGBRegressor
+# for Linear Regression
+from sklearn.linear_model import LinearRegression
 # tests
-from sklearn.datasets import load_boston
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 from sklearn.model_selection import train_test_split
 # plots
 import matplotlib.pyplot as plt
@@ -77,7 +79,8 @@ from mpl_toolkits import mplot3d
 print("----------- LOAD DATAS ------------")
 
 X_train = np.empty([198,3,11])
-X_train_app = np.empty([198,33])
+#X_train_app = np.empty([198,33])
+X_train_app = np.empty([198,11])
 
 y_train = np.empty([198,3])
 y_train_app1 = np.empty([198])
@@ -85,7 +88,8 @@ y_train_app2 = np.empty([198])
 y_train_app3 = np.empty([198])
 
 X_val = np.empty([100,3,11])
-X_val_app = np.empty([100,33])
+#X_val_app = np.empty([100,33])
+X_val_app = np.empty([100,11])
 
 y_val = np.empty([100,3])
 y_val_app1 = np.empty([100])
@@ -94,45 +98,45 @@ y_val_app3 = np.empty([100])
 
 
 days = 2
-stations = ['dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','zhiwuyuan','fengtaihuayuan','yungang','gucheng','fangshan','daxing','yizhuang','tongzhou','shunyi','pingchang','mentougou','pinggu','huairou','miyun','yanqing','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
-
+stations = ['dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','fengtaihuayuan','yungang','gucheng','fangshan','daxing','yizhuang','tongzhou','shunyi','pingchang','mentougou','pinggu','huairou','miyun','yanqing','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
+# ,'zhiwuyuan'
 stationsStart1 = ['zhiwuyuan','dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','yungang','gucheng','yizhuang','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
 stationsStart2 = ['yanqing','shunyi','daxing','pingchang','miyun']
 stationsStart3 = ['pinggu']
 stationsStart4 = ['mentougou']
 stationsStart5 = ['tongzhou','huairou','fengtaihuayuan']
 stationsStart6 = ['fangshan']
-stations = ['dongsi'] # pick one for test
+#stations = ['dongsi'] # pick one for test
 for s in stations :
     #print(s)
     all = pd.read_csv('../final_project_data/mergeBeijing/'+s+'.csv')
     #print(all.shape)
     if (s in stationsStart1):
-        startDate = 10042
-        endDate = 10089
+        startDateTest = 10042
+        endDateTest = 10089
     elif (s in stationsStart2):
-        startDate = 9375
-        endDate = 9422
+        startDateTest = 9375
+        endDateTest = 9422
     elif (s in stationsStart3):
-        startDate = 9372
-        endDate = 9419
+        startDateTest = 9372
+        endDateTest = 9419
     elif (s in stationsStart4):
-        startDate = 9373
-        endDate = 9420
+        startDateTest = 9373
+        endDateTest = 9420
     elif (s in stationsStart5):
-        startDate = 9374
-        endDate = 9421
+        startDateTest = 9374
+        endDateTest = 9421
     elif (s in stationsStart6):
-        startDate = 9375
-        endDate = 9420
+        startDateTest = 9375
+        endDateTest = 9420
 
     # SI ON VEUT CONCAT : SEPARER SELECTION ET NUMPY
-    X_test = all.loc[startDate:endDate,['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+    X_test = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     '''
     print(X_test[0])
     print(X_test[-1])
     '''
-    y_test = all.loc[startDate:endDate,['PM2.5','PM10','O3']].to_numpy()
+    y_test = all.loc[startDateTest:endDateTest,['PM2.5','PM10','O3']].to_numpy()
     X = all[['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     y = all[['PM2.5','PM10','O3']].to_numpy()
     '''
@@ -163,14 +167,19 @@ for s in stations :
     # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
     X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
     X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
+    '''
     X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
     X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
+    '''
+    X_train4 = np.array([X[i] for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
+    X_val4 = np.array([ X[i] for i in range(198,300-3+1)   ])
+
     y_train3, y_val3 = y[3:201], y[201:301]
     y_train4,y_val4 = y[3:201,0], y[201:301,0]
     y_train5,y_val5 = y[3:201,1], y[201:301,1]
     y_train6,y_val6 = y[3:201,2], y[201:301,2]
-    print(y_train3.shape)
     '''
+    print(y_train3.shape)
     print(X_train4[0])
     print(X_val4[0])
     print(X_train4.shape)
@@ -196,6 +205,15 @@ for s in stations :
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
     y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
 
+    x = range(len(y_train6))
+    y = y_train6
+    plt.plot(x,y)
+    plt.xlabel('utc_time')
+    plt.ylabel('2.5PM Level')
+    plt.title('2.5PM from data training : '+ s)
+    plt.show()
+
+
 print("final matrix : ")
 X_train = X_train[198:]
 X_train_app = X_train_app[198:]
@@ -212,7 +230,7 @@ y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
 y_val_app3 = y_val_app3[100:]
-'''
+
 print(X_train.shape)
 print(X_val.shape)
 print(X_train_app.shape)
@@ -224,10 +242,35 @@ print(y_val_app1.shape)
 print(y_val_app2.shape)
 print(y_val_app3.shape)
 '''
+x = range(len(y_train_app1))
+y = y_train_app1
+plt.plot(x,y)
+plt.xlabel('utc_time')
+plt.ylabel('PM2.5 Level')
+plt.title('PM2.5 from data training')
+plt.show()
+'''
+
 
 print("----------- START TESTS : Linerar Regression ------------")
+'''
+X_train_l = X_train_app
+y_train_l = y_train_app1
+#X_test_l = X_test
+X_val_l = X_val_app
+y_val_l = y_val_app1
 
 
+reg = LinearRegression().fit(X_train_l,y_train_l)
+err = mean_squared_error(y_val_l,reg.predict(X_val_l))
+
+print("mean squared error : ")
+print(err)
+pred = reg.predict(X_val_l)
+for i in range(10) :
+    print("test : ", y_val_l[i])
+    print("pred = ", pred[i])
+'''
 print("----------- START TESTS : Gradient Tree Boosting ------------")
 # https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting
 # https://stackabuse.com/gradient-boosting-classifiers-in-python-with-scikit-learn/
@@ -246,25 +289,25 @@ print(y_train_sparse.shape)
 print(X_val_sparse.shape)
 print(y_val_sparse.shape)
 '''
+min_error = 100000000000000000
 '''
-min_error = 1000
-
 n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600,750,1000,1250,1500,1750])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
-
-n_est = np.array([1, 2, 3])
-learning_rates = np.array([0.01, 0.02, 0.03])
-max_depths = np.array([1,2])
+'''
+'''
+n_est = np.array([50,100,150,200,250,300,350,400])
+learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1])
+max_depths = np.array([1,2,3])
 
 for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
-            print(X_train_app.shape)
-            print(y_train_app1.shape)
+            print('esti: ', esti, ' learning_rate : ', lr, ' depth : ', depth)
             est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
             # make cross validation error
-            error = mean_squared_error(y_val, est.predict(X_val_app))
+            error = mean_squared_error(y_val_app1, est.predict(X_val_app))
+            #print(error)
             if error < min_error :
                 min_error = error
                 best_n_est = esti
@@ -280,7 +323,7 @@ print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app, y_train)
+est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app, y_train_app1)
 pred = est.predict(X_val_app) # CHANGE IN TEST
 
 # COMPARER DEUX PLOTS :
@@ -295,21 +338,11 @@ pred = est.predict(X_val_app) # CHANGE IN TEST
 
 
 for i in range(10) :
-    print("test : ", y_test[i])
+    print("test : ", y_val_app1[i])
     print("pred = ", pred[i])
 
 '''
-# OR :
-'''
-# https://www.datacareer.ch/blog/parameter-tuning-in-gradient-boosting-gbm-with-python/
-p_test2 = {'max_depth':[2,3,4,5,6,7] }
-p_test3 = {'max_depth':[2,3,4,5,6,7], 'learning_rate':[0.15,0.1,0.05,0.01,0.005,0.001], 'n_estimators':[100,250,500,750,1000,1250,1500,1750]}
 
-tuning = GridSearchCV(estimator =GradientBoostingRegressor(random_state=0, loss = 'ls'),
-            param_grid = p_test3, scoring='neg_mean_squared_error', cv=5)
-tuning.fit(X_train,y_train)
-print(tuning.best_params_, tuning.best_score_)
-'''
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
 print("----------- START TESTS : SVM / cross validation ------------")
@@ -415,32 +448,20 @@ constraints is a list of constraints that allows the user to specify whether a
 function should have a monotonically constraint. This needs to be a string
 in [‘convex’, ‘concave’, ‘monotonic_inc’, ‘monotonic_dec’,’circular’, ‘none’]
 '''
-
 '''
-boston = load_boston()
-df = pd.DataFrame(boston.data, columns=boston.feature_names)
-target_df = pd.Series(boston.target)
-df.head()
-
-X = df.fillna(df.mean()) # combined X = df, X = X.fillna(X.mean())
-y = target_df.fillna(target_df.mean())
-X = X.to_numpy()
-y = y.to_numpy()
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-
 # set model : OVER CONSTRAINT, LAM, SPLINES
-gam = LinearGAM(n_splines=10).gridsearch(X_train, y_train)
+gam = LinearGAM(n_splines=10).gridsearch(X_train_app, y_train_app1)
 #gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
 #gam.summary()
 
 #prediction :
-predictions = gam.predict(X_test)
-print("Mean squared error: {} over {} samples".format(mean_squared_error(y_test, predictions), y.shape[0]))
+predictions = gam.predict(X_val_app)
+print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app1, predictions), y_val_app1.shape[0]))
 
 print("y test : ")
-print(y_test)
+print(y_val_app1)
 print("predictions : ")
+
 print(predictions)
 '''
 
@@ -466,18 +487,44 @@ plt.show()
 print("----------- END TESTS GAM ------------")
 
 print("----------- START TESTS Multiclass Neural Network  ------------")
-'''
-C_mat = data_predict_x.corr()
-fig = plt.figure(figsize = (15,15))
-'''
-'''
-for i in range(10) :
-    print("test : ", y_test[i])
-    print("pred = ", pred[i])
-'''
-
 print("----------- END TESTS Multiclass Neural Network  ------------")
 
+print("----------- START TESTS xgboost  ------------")
+# https://xgboost.readthedocs.io/en/latest/parameter.html
+# https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/
+'''
+# read in data
+dtrain = xgb.DMatrix(X_train_app,label=y_train_app1bis)
+dtest = xgb.DMatrix(X_val_app)
+
+
+# specify parameters via map
+param = {'max_depth':2, 'eta':1, 'objective':'binary:logistic' }
+num_round = 2
+bst = xgb.train(param, dtrain, num_round)
+# make prediction
+preds = bst.predict(dtest)
+for i in range(10):
+    print(preds[i])
+    print(y_val_app1[i])
+'''
+'''
+seed = 123
+res = xgb.cv(xgb_params, dtrain, num_boost_round=1000, nfold=4, seed=seed, stratified=False,early_stopping_rounds=25, verbose_eval=10, show_stdv=True)
+best_nrounds = res.shape[0] - 1
+print(np.shape(X_train_app), np.shape(X_val_app), np.shape(y_train_app1), np.shape(y_val_app1))
+gbdt = xgb.train(xgb_params, dtrain, best_nrounds)
+y_predicted = gbdt.predict(dtest)
+plt.figure(figsize=(10, 5))
+plt.scatter(y_val_app1, y_train_app1, s=20)
+rmse_pred_vs_actual = self.rmse(y_predicted, y_val_app1)
+plt.title(''.join([title_name, ', Predicted vs. Actual.', ' rmse = ', str(rmse_pred_vs_actual)]))
+plt.xlabel('Actual Sale Price')
+plt.ylabel('Predicted Sale Price')
+plt.plot([min(y_val_app1), max(y_val_app1)], [min(y_val_app1), max(y_val_app1)])
+plt.tight_layout()
+'''
+print("----------- END TESTS xgboost  ------------")
 
 '''
 TODO :
