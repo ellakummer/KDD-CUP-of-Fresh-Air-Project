@@ -450,7 +450,7 @@ df.head()
 X = df.fillna(df.mean()) # combined X = df, X = X.fillna(X.mean())
 y = target_df.fillna(target_df.mean())
 X = X.to_numpy()
-y = y.to_numpy()'''
+y = y.to_numpy()
 
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
@@ -463,7 +463,7 @@ gam = LinearGAM(n_splines=10).gridsearch(X_train_app, y_train_app2)
 predictions = gam.predict(X_val_app)
 print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app2, predictions), y.shape[0]))
 
-'''
+
 print("y test : ")
 print(y_test)
 print("predictions : ")
@@ -501,23 +501,27 @@ for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
 '''
-'''
+
 error = 10000
 
-max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
+max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
+activation = ['identity', 'logistic', 'tanh', 'relu']
 
 for it in max_iter:
-    #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
-    regr = MLPRegressor(max_iter = it).fit(X_train_app, y_train_app1)
-    err = mean_squared_error(y_val_app1, regr.predict(X_val_app))
-    if (err < error):
-        error = err
-        best_it = it
+    for acti in activation:
+        #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
+        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app, y_train_app2)
+        err = mean_squared_error(y_val_app2, regr.predict(X_val_app))
+        if (err < error):
+            error = err
+            best_it = it
+            best_acti = acti
 
 
 print('Best min error : ', error)
 print('best it : ', best_it)
-'''
+print('best acti : ', best_acti)
+
 
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
