@@ -40,15 +40,21 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
 import seaborn as sb
 '''
+from sklearn.neural_network import MLPRegressor
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+
 #for xgboost
-import xgboost as xgb
-from xgboost import XGBRegressor
+# import xgboost as xgb
+# from xgboost import XGBRegressor
 # for Linear Regression
 from sklearn.linear_model import LinearRegression
 # tests
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 from sklearn.model_selection import train_test_split
+
+
 # plots
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -229,8 +235,9 @@ for s in stations :
     X_val4_O3 = np.array([X_O3[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
 
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
-    y_train5, y_val5 = y[startDateTest-300:startDateTest-100,2], y[startDateTest-100:startDateTest,1]
-    y_train6, y_val6 = y[startDateTest-300:startDateTest-100,2], y[startDateTest-100:startDateTest,1]
+    y_train5, y_val5 = y[startDateTest-300:startDateTest-100,1], y[startDateTest-100:startDateTest,1]
+    y_train6, y_val6 = y[startDateTest-300:startDateTest-100,2], y[startDateTest-100:startDateTest,2]
+
     '''
     print(X_train4[0])
     print(X_val4[-1])
@@ -377,7 +384,7 @@ n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 '''
-
+'''
 n_est = np.array([50,100,150,200,250,300,350,400])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1])
 max_depths = np.array([1,2,3])
@@ -423,7 +430,7 @@ for i in range(10) :
     print("test : ", y_val_app2[i])
     print("pred = ", pred[i])
 
-
+'''
 
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
@@ -456,12 +463,20 @@ This means that larger negative MAE are better and a perfect model has a MAE of 
 '''
 
 max_score = 0
-X, y = data_predict_x, column4
+# X, y = data_predict_x, column4
 # TO SET PARAMETERS
+'''
 max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
 max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
 n_estimator = np.array([10,50,100, 200, 300, 400, 500]) # sdet tp 100 by default
 max_depth = np.array([None,1,2,3,4,5,6,7])
+'''
+
+'''
+max_sample = np.array([0.1, 0.2])
+max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
+n_estimator = np.array([100, 200]) # sdet tp 100 by default
+max_depth = np.array([None,1,2])
 
 for max_samp in max_sample :
     for max_feat in max_feature :
@@ -469,7 +484,7 @@ for max_samp in max_sample :
             for n in n_estimator :
                 model = RandomForestRegressor(max_samples = max_samp, max_features = max_feat, n_estimators = n, max_depth = max_dep)
                 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-                n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+                n_scores = cross_val_score(model, X_train_app_O3, y_train_app3, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
                 if mean(n_scores) < max_score :
                     max_score = mean(n_scores)
                     best_n_est = n
@@ -487,15 +502,26 @@ print("best max_depth : ")
 print(best_max_depth)
 
 print("results cross-validation error w/ best parameters : ")
-X, y = data_predict_x, column4
+# X, y = data_predict_x, column4
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+n_scores = cross_val_score(model, X_train_app_O3, y_train_app3, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 print('MAE: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
 
 print("prediciton...")
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
-model.fit(X_train, y_train)
+model.fit(X_train_app_O3, y_train_app3)
+
+pred = model.predict(X_val_app_O3)
+error = mean_squared_error(y_val_app3, pred)
+
+
+print('predicted :', pred[:20])
+print('real : ', y_val_app3[:20])
+print('mean error : ', error)
+'''
+
+'''
 y_test_pred = model.predict(X_test)
 mean_sq_err = mean_squared_error(y_test_pred, y_test)
 print("Mean squared error : ")
@@ -504,7 +530,7 @@ print('Prediction[0]: %d' % yhat[0])
 print('Should predict : %d' %y_test[0])
 print('Prediction[1]: %d' % yhat[1])
 print('Should predict : %d' %y_test[1])
-
+'''
 
 print("----------- END TESTS Random Forest ------------")
 
@@ -532,20 +558,24 @@ in [‘convex’, ‘concave’, ‘monotonic_inc’, ‘monotonic_dec’,’cir
 '''
 '''
 # set model : OVER CONSTRAINT, LAM, SPLINES
-gam = LinearGAM(n_splines=10).gridsearch(X_train_app, y_train_app1)
+gam = LinearGAM(n_splines=10).gridsearch(X_train_app_O3, y_train_app3)
 #gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
-#gam.summary()
+#gam.summary() 90.17505659  91.18563718  90.72000938  91.73058997  96.41694501
+ # 103.18572045 107.25973648 108.15923207  93.70505515  93.70505515
+ # 110.54744769  99.41384342  99.41384342  99.90673222 115.43220469
+ # 116.10504958 116.77127034 112.77566787 125.00162461 125.00162461]
+ #
 
 #prediction :
-predictions = gam.predict(X_val_app)
-print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app1, predictions), y_val_app1.shape[0]))
+predictions = gam.predict(X_val_app_O3)
+print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app3, predictions), y_val_app3.shape[0]))
 
 print("y test : ")
-print(y_val_app1)
+print(y_val_app3)
 print("predictions : ")
 
-print(predictions)
-'''
+print(predictions)'''
+
 
 #y_test=y_test.astype('int')
 #predictions=predictions.astype('int')
@@ -578,17 +608,24 @@ for i in range(10) :
     print("test : ", y_test[i])
     print("pred = ", pred[i])
 '''
-'''
-error = 10000
 
-max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
+error = 10000
+#
+# max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
+# activation = ['identity', 'logistic', 'tanh', 'relu']
+
+max_iter = [ 950, 1000, 1050, 1100, 1150, 1200 ]
 activation = ['identity', 'logistic', 'tanh', 'relu']
+activation = ['relu']
 
 for it in max_iter:
     for acti in activation:
         #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
-        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app, y_train_app2)
-        err = mean_squared_error(y_val_app2, regr.predict(X_val_app))
+        print('it = ', it)
+        print('acti = ', acti)
+        print('##################')
+        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app_O3, y_train_app3)
+        err = mean_squared_error(y_val_app3, regr.predict(X_val_app_O3))
         if (err < error):
             error = err
             best_it = it
@@ -598,7 +635,7 @@ for it in max_iter:
 print('Best min error : ', error)
 print('best it : ', best_it)
 print('best acti : ', best_acti)
-'''
+
 print("----------- END TESTS Multiclass Neural Network  ------------")
 
 print("----------- START TESTS xgboost  ------------")
