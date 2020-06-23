@@ -341,20 +341,33 @@ y_train_app2_total = np.append(y_train_app2, y_val_app2, axis=0)
 
 print("----------- START TESTS : Linerar Regression ------------")
 
-X_train_l = X_train_app_reduc
-y_train_l = y_train_app2
+X_train_l = X_train_app_total_reduc
+y_train_l1 = y_train_app1_total
+y_train_l2 = y_train_app2_total
 #X_test_l = X_test
-X_val_l = X_val_app_reduc
-y_val_l = y_val_app2
+y_train_l = y_val_app2
 
 # print(X_train_l)
 # for i in range(len(X_train_l)):
 #     print(X_train_l[i])
 
 '''
-reg = LinearRegression().fit(X_train_l,y_train_l)
-err = mean_squared_error(y_val_l,reg.predict(X_val_l))
-print('error : ', err)
+print('PM2.5')
+reg = LinearRegression().fit(X_train_l,y_train_l1)
+pred = reg.predict(X_train_l)
+err = mean_squared_error(y_train_l1,pred)
+print('mean error : ', err)
+print('real : ', y_train_l1[:20])
+print('pred : ', pred[:20])
+
+print('###########################################################################')
+print('PM10')
+reg = LinearRegression().fit(X_train_l,y_train_l2)
+pred = reg.predict(X_train_l)
+err = mean_squared_error(y_train_l2,pred)
+print('mean error : ', err)
+print('real : ', y_train_l2[:20])
+print('pred : ', pred[:20])
 '''
 
 #pred = reg.predict(X_test_l)
@@ -405,7 +418,6 @@ for esti in n_est :
             cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
             n_scores = cross_val_score(model, X_train_app_total_reduc, y_train_app2_total, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
             # print(n_scores)
-
             if mean(n_scores) < max_score :
                 max_score = mean(n_scores)
                 min_error = mean_squared_error(y_train_app2_total, model.predict(X_train_app_total_reduc))
@@ -428,8 +440,25 @@ print(best_lr)
 print("with max_depth : ")
 print(best_depth)
 '''
-# est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train, y_train)
-# pred = est.predict(X_test)
+
+'''
+print('PM2.5')
+est = GradientBoostingRegressor(n_estimators=1750, learning_rate=0.5, max_depth=6, random_state=0, loss='ls').fit(X_train_app_total_reduc, y_train_app1_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app1_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app1_total[:20])
+print('pred : ', pred[:20])
+
+print('###########################################################################')
+print('PM10')
+est = GradientBoostingRegressor(n_estimators=1750, learning_rate=0.5, max_depth=6, random_state=0, loss='ls').fit(X_train_app_total_reduc, y_train_app2_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app2_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app2_total[:20])
+print('pred : ', pred[:20])
+'''
 
 # COMPARER DEUX PLOTS :
 # Y_TEST REELS A PREDIRE
@@ -562,6 +591,26 @@ print('mean error : ', mean_squared_error(y_train_app2_total, pred))
 '''
 
 '''
+print('PM2.5')
+est = RandomForestRegressor(max_samples = 0.9, max_features = 1, n_estimators = 50, max_depth = 30).fit(X_train_app_total_reduc, y_train_app1_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app1_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app1_total[:20])
+print('pred : ', pred[:20])
+
+print('###########################################################################')
+print('PM10')
+est = RandomForestRegressor(max_samples = 0.9, max_features = 1, n_estimators = 300, max_depth = 30).fit(X_train_app_total_reduc, y_train_app2_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app2_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app2_total[:20])
+print('pred : ', pred[:20])
+'''
+
+
+'''
 y_test_pred = model.predict(X_test)
 mean_sq_err = mean_squared_error(y_test_pred, y_test)
 print("Mean squared error : ")
@@ -619,8 +668,29 @@ gam = LinearGAM(n_splines=10).gridsearch(X_train_app_reduc, y_train_app2)
 #prediction :
 predictions = gam.predict(X_val_app_reduc)
 print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app1, predictions), y.shape[0]))
+'''
+
+'''
+print('PM2.5')
+est = LinearGAM(n_splines=10).gridsearch(X_train_app_total_reduc, y_train_app1_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app1_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app1_total[:20])
+print('pred : ', pred[:20])
+
+print('###########################################################################')
+print('PM10')
+est = LinearGAM(n_splines=10).gridsearch(X_train_app_total_reduc, y_train_app2_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app2_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app2_total[:20])
+print('pred : ', pred[:20])
+'''
 
 
+'''
 print("y val real : ")
 print(y_val_app2)
 print("predictions : ")
@@ -659,6 +729,7 @@ for i in range(10) :
     print("pred = ", pred[i])
 '''
 
+'''
 print('FOR PM2.5')
 max_score = 0
 
@@ -731,8 +802,26 @@ pred = model.predict(X_train_app_total_reduc)
 print('predicted :', pred[:20])
 print('real : ', y_train_app2_total[:20])
 print('mean error predicted: ', mean_squared_error(y_train_app2_total, pred))
+'''
 
+'''
+print('PM2.5')
+est = MLPRegressor(max_iter = 1150, activation = 'relu').fit(X_train_app_total_reduc, y_train_app1_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app1_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app1_total[:20])
+print('pred : ', pred[:20])
 
+print('###########################################################################')
+print('PM10')
+est = MLPRegressor(max_iter = 800, activation = 'relu').fit(X_train_app_total_reduc, y_train_app2_total)
+pred = est.predict(X_train_app_total_reduc)
+error = mean_squared_error(y_train_app2_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app2_total[:20])
+print('pred : ', pred[:20])
+'''
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
 

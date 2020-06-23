@@ -53,6 +53,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
+
 # https://www.hindawi.com/journals/jece/2017/5106045/
 
 # https://medium.com/mongolian-data-stories/ulaanbaatar-air-pollution-part-1-35e17c83f70b (ici plus discret mdr)
@@ -453,7 +454,7 @@ of the model across all repeats and folds. The scikit-learn library makes the
 MAE negative so that it is maximized instead of minimized.
 This means that larger negative MAE are better and a perfect model has a MAE of 0.
 '''
-
+'''
 max_score = 0
 X, y = data_predict_x, column4
 # TO SET PARAMETERS
@@ -503,7 +504,7 @@ print('Prediction[0]: %d' % yhat[0])
 print('Should predict : %d' %y_test[0])
 print('Prediction[1]: %d' % yhat[1])
 print('Should predict : %d' %y_test[1])
-
+'''
 
 print("----------- END TESTS Random Forest ------------")
 
@@ -604,36 +605,6 @@ print("----------- START TESTS xgboost  ------------")
 # https://xgboost.readthedocs.io/en/latest/parameter.html
 # https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/
 
-
-# specify parameters via map
-param = {'max_depth':2, 'eta':1, 'objective':'binary:logistic' }
-num_round = 2
-bst = xgb.train(param, dtrain, num_round)
-# make prediction
-preds = bst.predict(dtest)
-for i in range(10):
-    print(preds[i])
-    print(y_val_app1[i])
-'''
-# OPTION 2
-'''
-seed = 123
-res = xgb.cv(xgb_params, dtrain, num_boost_round=1000, nfold=4, seed=seed, stratified=False,early_stopping_rounds=25, verbose_eval=10, show_stdv=True)
-best_nrounds = res.shape[0] - 1
-print(np.shape(X_train_app), np.shape(X_val_app), np.shape(y_train_app1), np.shape(y_val_app1))
-gbdt = xgb.train(xgb_params, dtrain, best_nrounds)
-y_predicted = gbdt.predict(dtest)
-plt.figure(figsize=(10, 5))
-plt.scatter(y_val_app1, y_train_app1, s=20)
-rmse_pred_vs_actual = self.rmse(y_predicted, y_val_app1)
-plt.title(''.join([title_name, ', Predicted vs. Actual.', ' rmse = ', str(rmse_pred_vs_actual)]))
-plt.xlabel('Actual Sale Price')
-plt.ylabel('Predicted Sale Price')
-plt.plot([min(y_val_app1), max(y_val_app1)], [min(y_val_app1), max(y_val_app1)])
-plt.tight_layout()
-'''
-
-# data_dmatrix = xgb.DMatrix(data=X,label=y)
 # OPTION 3
 '''
 xg_reg = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 10)
@@ -649,7 +620,7 @@ plt.show()
 '''
 
 
-data_dmatrix = xgb.DMatrix(data=np.append(X_train_app_PM,X_val_app_PM,axis=0),label=np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
+data_dmatrix = xgb.DMatrix(data=np.append(X_train_app_O3,X_val_app_O3,axis=0),label=np.append(y_train_app3/1000,y_val_app3/1000,axis=0))
 min_error = 100000
 objective = np.array(["binary:logistic"])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
@@ -691,13 +662,13 @@ print(best_sub)
 
 #xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 10) # FOR PM10
 xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
-xg_reg.fit(np.append(X_train_app_PM,X_val_app_PM,axis=0),np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
+xg_reg.fit(np.append(X_train_app_O3,X_val_app_03,axis=0),np.append(y_train_app3/1000,y_val_app3/1000,axis=0))
 pred = xg_reg.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0))
 pred = pred*1000
-rmse = np.sqrt(mean_squared_error(np.append(y_train_app1,y_val_app1,axis=0), pred))
+rmse = np.sqrt(mean_squared_error(np.append(y_train_app3,y_val_app3,axis=0), pred))
 print("mse : ", rmse)
 for i in range(10) :
-    print("test : ", np.append(y_train_app1,y_val_app1,axis=0)[i])
+    print("test : ", np.append(y_train_app3,y_val_app3,axis=0)[i])
     print("pred = ", pred[i])
 # OPTION 5
 
