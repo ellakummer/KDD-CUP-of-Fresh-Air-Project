@@ -619,7 +619,7 @@ plt.rcParams['figure.figsize'] = [5, 5]
 plt.show()
 '''
 
-
+'''
 data_dmatrix = xgb.DMatrix(data=np.append(X_train_app_O3,X_val_app_O3,axis=0),label=np.append(y_train_app3/1000,y_val_app3/1000,axis=0))
 min_error = 100000
 objective = np.array(["binary:logistic"])
@@ -633,7 +633,7 @@ for obj in objective:
             for lr in learning_rates:
                 for sub in subsample:
                     params = {'objective': obj,'colsample_bytree': cb,'learning_rate': lr,'max_depth': max_dep,'subsample': sub,'alpha': 10}
-                    cv_results = xgb.cv(dtrain=data_dmatrix, params=params, nfold=3, num_boost_round=50,early_stopping_rounds=10,metrics="rmse", as_pandas=True, seed=123)
+                    cv_results = xgb.cv(dtrain=data_dmatrix, params=params, nfold=10, num_boost_round=50,early_stopping_rounds=10,metrics="rmse", as_pandas=True, seed=123)
                     #print(cv_results.head())
                     print((cv_results["test-rmse-mean"]).tail(1))
                     error = (cv_results["test-rmse-mean"]).tail(1).values[0]
@@ -658,11 +658,11 @@ print("with best_colysample_bytree : ")
 print(best_colysample_bytree)
 print("with subsample : ")
 print(best_sub)
-
-
-#xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 10) # FOR PM10
-xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
-xg_reg.fit(np.append(X_train_app_O3,X_val_app_03,axis=0),np.append(y_train_app3/1000,y_val_app3/1000,axis=0))
+'''
+# SIDE NOTE : alpha values could have been tested too -> still not as good as gradient tree boosting 
+xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 2) # FOR PM2.5 -> MSE = 16.552617929952707, FOR PM10 -> MSE = 15.86213816059505, FOR O3 -> MSE = 13.451175283521856
+#xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
+xg_reg.fit(np.append(X_train_app_PM,X_val_app_PM,axis=0),np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
 pred = xg_reg.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0))
 pred = pred*1000
 rmse = np.sqrt(mean_squared_error(np.append(y_train_app3,y_val_app3,axis=0), pred))
@@ -670,12 +670,6 @@ print("mse : ", rmse)
 for i in range(10) :
     print("test : ", np.append(y_train_app3,y_val_app3,axis=0)[i])
     print("pred = ", pred[i])
-# OPTION 5
 
 
 print("----------- END TESTS xgboost  ------------")
-
-'''
-TODO :
-- cross validation everywhere
-'''

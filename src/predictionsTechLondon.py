@@ -35,21 +35,12 @@ from sklearn.metrics import log_loss
 
 from sklearn.linear_model import LinearRegression
 
-
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-# for Multiclass Neural Network
-'''
-from keras.callbacks import ModelCheckpoint
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten
-import seaborn as sb
-import warnings
-warnings.filterwarnings('ignore')
-warnings.filterwarnings('ignore', category=DeprecationWarning)
-#from xgboost import XGBRegressor
-'''
+#for xgboost
+import xgboost as xgb
+from xgboost import XGBRegressor
 
 from sklearn.neural_network import MLPRegressor
 from sklearn.datasets import make_regression
@@ -825,8 +816,58 @@ print('pred : ', pred[:20])
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
 
+print("----------- START TESTS xgboost  ------------")
 
-'''
-TODO :
-- cross validation everywhere
-'''
+data_dmatrix = xgb.DMatrix(data=X_train_app_total_reduc,label=y_train_app1_total/1000)
+min_error = 100000
+objective = np.array(["binary:logistic"])
+max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
+colsample_bytree = np.array([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9])
+learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
+subsample = np.array([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9])
+for obj in objective:
+    for max_dep in max_depths:
+        for cb in colsample_bytree:
+            for lr in learning_rates:
+                for sub in subsample:
+                    params = {'objective': obj,'colsample_bytree': cb,'learning_rate': lr,'max_depth': max_dep,'subsample': sub,'alpha': 10}
+                    cv_results = xgb.cv(dtrain=data_dmatrix, params=params, nfold=10, num_boost_round=50,early_stopping_rounds=10,metrics="rmse", as_pandas=True, seed=123)
+                    #print(cv_results.head())
+                    print((cv_results["test-rmse-mean"]).tail(1))
+                    error = (cv_results["test-rmse-mean"]).tail(1).values[0]
+                    if error < min_error :
+                        min_error = error
+                        best_objective = obj
+                        best_depth = max_dep
+                        best_colysample_bytree = cb
+                        best_lr = lr
+                        best_sub = sub
+
+
+print("best mean squared error : ")
+print(min_error)
+print("with learning_rate : ")
+print(best_lr)
+print("with max_depth : ")
+print(best_depth)
+print("with objective : ")
+print(best_objective)
+print("with best_colysample_bytree : ")
+print(best_colysample_bytree)
+print("with subsample : ")
+print(best_sub)
+
+# SIDE NOTE : alpha values could have been tested too -> still not as good as gradient tree boosting
+xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 2) # FOR PM2.5 -> MSE = 16.552617929952707, FOR PM10 -> MSE = 15.86213816059505, FOR O3 -> MSE = 13.451175283521856
+#xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
+xg_reg.fit(X_train_app_total_reduc,y_train_app1_total/1000)
+pred = xg_reg.predict(X_train_app_total_reduc)
+pred = pred*1000
+rmse = np.sqrt(mean_squared_error(y_train_app1_total, pred))
+print("mse : ", rmse)
+for i in range(10) :
+    print("test : ", y_train_app1_total[i])
+    print("pred = ", pred[i])
+
+
+print("----------- END TESTS xgboost  ------------")

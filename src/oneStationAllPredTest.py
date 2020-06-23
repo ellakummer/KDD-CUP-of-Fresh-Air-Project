@@ -618,7 +618,7 @@ plt.rcParams['figure.figsize'] = [5, 5]
 plt.show()
 '''
 
-all = pd.read_csv('../final_project_data/mergeBeijing/'+dongsi+'.csv')
+all = pd.read_csv('../final_project_data/mergeBeijing/dongsi.csv')
 
 startDateTest = 10042
 endDateTest = 10089
@@ -631,10 +631,10 @@ y_test_PM25 = y_test[:,0]
 y_test_PM10 = y_test[:,1]
 y_test_O3 = y_test[:,2]
 
-X = all[:startDateTest-1,['utc_time','temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
-X_O3 = all[:startDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
-X_PM = all[:startDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
-y = all[1:startDateTest,['utc_time','PM2.5','PM10','O3']].to_numpy()
+X = all.loc[:startDateTest-1,['utc_time','temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+X_O3 = all.loc[:startDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+X_PM = all.loc[:startDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+y = all.loc[1:startDateTest,['utc_time','PM2.5','PM10','O3']].to_numpy()
 y_PM5 = y[:,0]
 y_PM10 = y[:,1]
 y_O3 = y[:,2]
@@ -645,7 +645,7 @@ print(X[-1])
 print(y[-1])
 
 
-data_dmatrix = xgb.DMatrix(data=np.append(X_train_app_PM,X_val_app_PM,axis=0),label=np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
+data_dmatrix = xgb.DMatrix(data=X_PM,label=y_PM10/1000)
 min_error = 100000
 objective = np.array(["binary:logistic"])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
@@ -687,13 +687,13 @@ print(best_sub)
 
 #xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 10) # FOR PM10
 xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
-xg_reg.fit(np.append(X_train_app_PM,X_val_app_PM,axis=0),np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
-pred = xg_reg.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0))
+xg_reg.fit(X_PM,y_PM10/1000)
+pred = xg_reg.predict(X_PM)
 pred = pred*1000
-rmse = np.sqrt(mean_squared_error(np.append(y_train_app1,y_val_app1,axis=0), pred))
+rmse = np.sqrt(mean_squared_error(y_PM10, pred))
 print("mse : ", rmse)
 for i in range(10) :
-    print("test : ", np.append(y_train_app1,y_val_app1,axis=0)[i])
+    print("test : ", y_PM[i])
     print("pred = ", pred[i])
 # OPTION 5
 
