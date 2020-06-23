@@ -199,9 +199,7 @@ for s in stations :
     X_val = np.append(X_val, X_val3,axis=0)
     y_val = np.append(y_val, y_val3,axis=0)
     '''
-    #
-    # print(X_train_app.shape)
-    # print(X_train4.shape)
+    
     X_train = np.append(X_train, X_train3,axis=0)
     X_train_reduc = np.append(X_train_reduc, X_train3_reduc,axis=0)
 
@@ -211,8 +209,6 @@ for s in stations :
     y_train = np.append(y_train, y_train3,axis=0)
     y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
     y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
-    #y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
-
 
     X_val = np.append(X_val, X_val3,axis=0)
     X_val_reduc = np.append(X_val_reduc, X_val3_reduc,axis=0)
@@ -224,35 +220,6 @@ for s in stations :
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
 
-
-
-
-    #y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
-
-    # x = range(len(y_train5))
-    # y = y_train5
-    # plt.plot(x,y)
-    # plt.xlabel('utc_time')
-    # plt.ylabel('2.5PM Level')
-    # plt.title('2.5PM from data training : '+ s)
-    # plt.show()
-
-'''
-print("final matrix : ")
-X_train = X_train[198:]
-y_train = y_train[198:]
-X_val= X_val[100:]
-y_val = y_val[100:]
-'''
-
-#print("final matrix : ")
-# X_train = X_train[198:]
-# X_train_app = X_train_app[198:]
-#
-# y_train = y_train[198:]
-# y_train_app1 = y_train_app1[198:]
-# y_train_app2 = y_train_app2[198:]
-# #y_train_app3 = y_train_app3[198:]
 
 X_train = X_train[200:]
 X_train_reduc = X_train_reduc[200:]
@@ -273,22 +240,12 @@ X_val_app_reduc = X_val_app_reduc[100:]
 y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
-#y_val_app3 = y_val_app3[100:]
 
 X_train_app_total = np.append(X_train_app, X_val_app, axis=0)
 X_train_app_total_reduc = np.append(X_train_app_reduc, X_val_app_reduc, axis=0)
 
-# print(X_train_app.shape)
-# print(X_val_app.shape)
-#
-# print(X_train_app_total.shape)
-# print(X_train_app_total_reduc.shape)
-
 y_train_app1_total = np.append(y_train_app1, y_val_app1, axis=0)
 y_train_app2_total = np.append(y_train_app2, y_val_app2, axis=0)
-
-# print('shape X_train_app : ', X_train_app.shape)
-# print('shape y_train_app1 : ', y_train_app1.shape)
 
 print("---------------------------PREDICT ---------------------------------")
 

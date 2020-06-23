@@ -199,7 +199,7 @@ for s in stations :
     X_val4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_train4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     '''
-    # USE THE PREVIOUS HOUR TO PREDICT
+    # USE THE PREVIOUS HOUR TO PREDICT (again yes)
     X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
     X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
     X_train4_PM = np.array([X_PM[i] for i in range(startDateTest-300-1,startDateTest-100-1)])
@@ -330,7 +330,7 @@ y_val_l = y_val_app1
 reg = LinearRegression().fit(X_train_l,y_train_l)
 err = mean_squared_error(y_val_l,reg.predict(X_val_l))
 
-print("mean squared error : ")
+print("mean absolute error : ")
 print(err)
 pred = reg.predict(X_val_l)
 for i in range(10) :
@@ -355,7 +355,7 @@ print(y_train_sparse.shape)
 print(X_val_sparse.shape)
 print(y_val_sparse.shape)
 '''
-min_error = 100000000000000000
+min_error = -100000000000000000
 '''
 n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600,750,1000,1250,1500,1750])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
@@ -370,13 +370,12 @@ for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
             print('esti: ', esti, ' learning_rate : ', lr, ' depth : ', depth)
-            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app_O3, y_train_app3)
+            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0))
             # make cross validation error
             #error = mean_squared_error(y_val_app3, est.predict(X_val_app_O3))
-
             cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-            n_scores = cross_val_score(est, X_train_app_O3, y_train_app3, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-            if mean(n_scores) < min_error :
+            n_scores = cross_val_score(est, np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0), scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+            if mean(n_scores) > min_error :
                 min_error = mean(n_scores)
                 best_n_est = esti
                 best_lr = lr
@@ -391,11 +390,11 @@ print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app_O3, y_train_app3)
-pred = est.predict(X_val_app_O3) # CHANGE IN TEST
+est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0))
+pred = est.predict(np.append(X_train_app_O3,X_val_app_O3,axis=0)) # CHANGE IN TEST
 
 for i in range(10) :
-    print("test : ", y_val_app3[i])
+    print("test : ", np.append(y_train_app3,y_val_app3,axis=0)[i])
     print("pred = ", pred[i])
 
 

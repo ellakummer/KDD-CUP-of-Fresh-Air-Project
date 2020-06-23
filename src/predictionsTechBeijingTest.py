@@ -609,34 +609,147 @@ for i in range(10) :
     print("pred = ", pred[i])
 '''
 
-error = 10000
-#
-# max_iter = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200 ]
-# activation = ['identity', 'logistic', 'tanh', 'relu']
 
-max_iter = [ 950, 1000, 1050, 1100, 1150, 1200 ]
-activation = ['identity', 'logistic', 'tanh', 'relu']
+print('FOR PM2.5')
+max_score = -10000000
+
+max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
 activation = ['relu']
 
 for it in max_iter:
     for acti in activation:
         #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
-        print('it = ', it)
-        print('acti = ', acti)
-        print('##################')
-        regr = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app_O3, y_train_app3)
-        err = mean_squared_error(y_val_app3, regr.predict(X_val_app_O3))
-        if (err < error):
-            error = err
+        model = MLPRegressor(max_iter = it, activation = acti).fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0))
+        cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+        n_scores = cross_val_score(model, np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0), scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+        if mean(n_scores) > max_score :
+            model.fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0))
+            min_error = mean_squared_error(np.append(y_train_app1,y_val_app1,axis=0), model.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0)))
+            max_score = mean(n_scores)
             best_it = it
             best_acti = acti
+        # if (err < error):
+        #     error = err
+        #     best_it = it
+        #     best_acti = acti
 
-
-print('Best min error : ', error)
+print('Best max score : ', max_score)
+print('Best min error : ', min_error)
 print('best it : ', best_it)
 print('best acti : ', best_acti)
 
+model = MLPRegressor(max_iter = best_it, activation = best_acti).fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0))
+pred = model.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0))
+
+print('predicted :', pred[:20])
+print('real : ', np.append(y_train_app1,y_val_app1,axis=0)[:20])
+print('mean error predicted: ', mean_squared_error(np.append(y_train_app1,y_val_app1,axis=0), pred))
+
+
+print('########################################################################')
+print('FOR PM10')
+
+max_score = -10000000
+
+max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
+activation = ['relu']
+
+for it in max_iter:
+    for acti in activation:
+        #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
+        model = MLPRegressor(max_iter = it, activation = acti).fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app2,y_val_app2,axis=0))
+        cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+        n_scores = cross_val_score(model, np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app2,y_val_app2,axis=0), scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+        if mean(n_scores) > max_score :
+            model.fit(np.append(X_train_app_PM,X_val_app_PM,axsi=0), np.append(y_train_app2,y_val_app2,axis=0))
+            min_error = mean_squared_error(np.append(y_train_app2,y_val_app2,axis=0), model.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0)))
+            max_score = mean(n_scores)
+            best_it = it
+            best_acti = acti
+        # if (err < error):
+        #     error = err
+        #     best_it = it
+        #     best_acti = acti
+
+print('Best max score : ', max_score)
+print('Best min error : ', min_error)
+print('best it : ', best_it)
+print('best acti : ', best_acti)
+
+model = MLPRegressor(max_iter = best_it, activation = best_acti).fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app2,y_val_app2,axis=0))
+pred = model.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0))
+
+print('predicted :', pred[:20])
+print('real : ', np.append(y_train_app2,y_val_app2,axis=0)[:20])
+print('mean error predicted: ', mean_squared_error(np.append(y_train_app2,y_val_app2,axis=0), pred))
+
+print('########################################################################')
+print('FOR O3')
+
+max_score = -10000000
+
+max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
+activation = ['relu']
+
+for it in max_iter:
+    for acti in activation:
+        #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
+        model = MLPRegressor(max_iter = it, activation = acti).fit(np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0))
+        cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+        n_scores = cross_val_score(model, np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0), scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+        if mean(n_scores) > max_score :
+            model.fit(np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0))
+            min_error = mean_squared_error(np.append(y_train_app3,y_val_app3,axis=0), model.predict(np.append(X_train_app_O3,X_val_app_O3,axis=0)))
+            max_score = mean(n_scores)
+            best_it = it
+            best_acti = acti
+        # if (err < error):
+        #     error = err
+        #     best_it = it
+        #     best_acti = acti
+
+print('Best max score : ', max_score)
+print('Best min error : ', min_error)
+print('best it : ', best_it)
+print('best acti : ', best_acti)
+
+model = MLPRegressor(max_iter = best_it, activation = best_acti).fit(np.append(X_train_app_O3,X_val_app_O3,axis=0), np.append(y_train_app3,y_val_app3,axis=0))
+pred = model.predict(np.append(X_train_app_O3,X_val_app_O3,axis=0))
+
+print('predicted :', pred[:20])
+print('real : ', np.append(y_train_app3,y_val_app3,axis=0)[:20])
+print('mean error predicted: ', mean_squared_error(np.append(y_train_app3,y_val_app3,axis=0), pred))
+'''
+print('###########################################################################')
+print('PM2.5')
+est = MLPRegressor(max_iter = 1150, activation = 'relu').fit(np.append(X_train_app_PM,X_val_app_PM), y_train_app1_total)
+pred = est.predict(np.append(X_train_app_PM,X_val_app_PM))
+error = mean_squared_error(y_train_app1_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app1_total[:20])
+print('pred : ', pred[:20])
+
+print('###########################################################################')
+print('PM10')
+est = MLPRegressor(max_iter = 800, activation = 'relu').fit(np.append(X_train_app_PM,X_val_app_PM), y_train_app2_total)
+pred = est.predict(np.append(X_train_app_PM,X_val_app_O3))
+error = mean_squared_error(y_train_app2_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app2_total[:20])
+print('pred : ', pred[:20])
+
+print('###########################################################################')
+print('O3')
+est = MLPRegressor(max_iter = 800, activation = 'relu').fit(np.append(X_train_app_O3,X_val_app_O3), y_train_app2_total)
+pred = est.predict(np.append(X_train_app_O3,X_val_app_O3))
+error = mean_squared_error(y_train_app2_total,pred)
+print('mean error : ', error)
+print('real : ', y_train_app2_total[:20])
+print('pred : ', pred[:20])
+'''
+
 print("----------- END TESTS Multiclass Neural Network  ------------")
+
 
 print("----------- START TESTS xgboost  ------------")
 # https://xgboost.readthedocs.io/en/latest/parameter.html
