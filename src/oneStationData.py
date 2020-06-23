@@ -114,7 +114,7 @@ stationsStart3 = ['pinggu']
 stationsStart4 = ['mentougou']
 stationsStart5 = ['tongzhou','huairou','fengtaihuayuan']
 stationsStart6 = ['fangshan']
-#stations = ['dongsi'] # pick one for test
+stations = ['dongsi'] # pick one for test
 for s in stations :
     #print(s)
     all = pd.read_csv('../final_project_data/mergeBeijing/'+s+'.csv')
@@ -453,7 +453,7 @@ of the model across all repeats and folds. The scikit-learn library makes the
 MAE negative so that it is maximized instead of minimized.
 This means that larger negative MAE are better and a perfect model has a MAE of 0.
 '''
-
+'''
 max_score = 0
 X, y = data_predict_x, column4
 # TO SET PARAMETERS
@@ -503,7 +503,7 @@ print('Prediction[0]: %d' % yhat[0])
 print('Should predict : %d' %y_test[0])
 print('Prediction[1]: %d' % yhat[1])
 print('Should predict : %d' %y_test[1])
-
+'''
 
 print("----------- END TESTS Random Forest ------------")
 
@@ -604,36 +604,6 @@ print("----------- START TESTS xgboost  ------------")
 # https://xgboost.readthedocs.io/en/latest/parameter.html
 # https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/
 
-
-# specify parameters via map
-param = {'max_depth':2, 'eta':1, 'objective':'binary:logistic' }
-num_round = 2
-bst = xgb.train(param, dtrain, num_round)
-# make prediction
-preds = bst.predict(dtest)
-for i in range(10):
-    print(preds[i])
-    print(y_val_app1[i])
-'''
-# OPTION 2
-'''
-seed = 123
-res = xgb.cv(xgb_params, dtrain, num_boost_round=1000, nfold=4, seed=seed, stratified=False,early_stopping_rounds=25, verbose_eval=10, show_stdv=True)
-best_nrounds = res.shape[0] - 1
-print(np.shape(X_train_app), np.shape(X_val_app), np.shape(y_train_app1), np.shape(y_val_app1))
-gbdt = xgb.train(xgb_params, dtrain, best_nrounds)
-y_predicted = gbdt.predict(dtest)
-plt.figure(figsize=(10, 5))
-plt.scatter(y_val_app1, y_train_app1, s=20)
-rmse_pred_vs_actual = self.rmse(y_predicted, y_val_app1)
-plt.title(''.join([title_name, ', Predicted vs. Actual.', ' rmse = ', str(rmse_pred_vs_actual)]))
-plt.xlabel('Actual Sale Price')
-plt.ylabel('Predicted Sale Price')
-plt.plot([min(y_val_app1), max(y_val_app1)], [min(y_val_app1), max(y_val_app1)])
-plt.tight_layout()
-'''
-
-# data_dmatrix = xgb.DMatrix(data=X,label=y)
 # OPTION 3
 '''
 xg_reg = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 10)
@@ -647,6 +617,32 @@ xgb.plot_importance(xg_reg)
 plt.rcParams['figure.figsize'] = [5, 5]
 plt.show()
 '''
+
+all = pd.read_csv('../final_project_data/mergeBeijing/'+dongsi+'.csv')
+
+startDateTest = 10042
+endDateTest = 10089
+
+X_test = all.loc[startDateTest:endDateTest-1,['utc_time','temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+X_test_O3 = all.loc[startDateTest:endDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+X_test_PMs = all.loc[startDateTest:endDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+y_test = all.loc[startDateTest+1:endDateTest,['utc_time','PM2.5','PM10','O3']].to_numpy()
+y_test_PM25 = y_test[:,0]
+y_test_PM10 = y_test[:,1]
+y_test_O3 = y_test[:,2]
+
+X = all[:startDateTest-1,['utc_time','temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+X_O3 = all[:startDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+X_PM = all[:startDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+y = all[1:startDateTest,['utc_time','PM2.5','PM10','O3']].to_numpy()
+y_PM5 = y[:,0]
+y_PM10 = y[:,1]
+y_O3 = y[:,2]
+
+print(X_test[0])
+print(y_test[0])
+print(X[-1])
+print(y[-1])
 
 
 data_dmatrix = xgb.DMatrix(data=np.append(X_train_app_PM,X_val_app_PM,axis=0),label=np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
