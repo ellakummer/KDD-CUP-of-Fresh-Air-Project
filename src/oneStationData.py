@@ -114,7 +114,7 @@ stationsStart3 = ['pinggu']
 stationsStart4 = ['mentougou']
 stationsStart5 = ['tongzhou','huairou','fengtaihuayuan']
 stationsStart6 = ['fangshan']
-#stations = ['dongsi'] # pick one for test
+stations = ['dongsi'] # pick one for test
 for s in stations :
     #print(s)
     all = pd.read_csv('../final_project_data/mergeBeijing/'+s+'.csv')
@@ -617,6 +617,32 @@ xgb.plot_importance(xg_reg)
 plt.rcParams['figure.figsize'] = [5, 5]
 plt.show()
 '''
+
+all = pd.read_csv('../final_project_data/mergeBeijing/'+dongsi+'.csv')
+
+startDateTest = 10042
+endDateTest = 10089
+
+X_test = all.loc[startDateTest:endDateTest-1,['utc_time','temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+X_test_O3 = all.loc[startDateTest:endDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+X_test_PMs = all.loc[startDateTest:endDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+y_test = all.loc[startDateTest+1:endDateTest,['utc_time','PM2.5','PM10','O3']].to_numpy()
+y_test_PM25 = y_test[:,0]
+y_test_PM10 = y_test[:,1]
+y_test_O3 = y_test[:,2]
+
+X = all[:startDateTest-1,['utc_time','temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+X_O3 = all[:startDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
+X_PM = all[:startDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
+y = all[1:startDateTest,['utc_time','PM2.5','PM10','O3']].to_numpy()
+y_PM5 = y[:,0]
+y_PM10 = y[:,1]
+y_O3 = y[:,2]
+
+print(X_test[0])
+print(y_test[0])
+print(X[-1])
+print(y[-1])
 
 
 data_dmatrix = xgb.DMatrix(data=np.append(X_train_app_PM,X_val_app_PM,axis=0),label=np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
