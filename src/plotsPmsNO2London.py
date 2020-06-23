@@ -55,7 +55,7 @@ plt.show()
 '''
 print(" -------------------- DATAT THREE WEEK VISUALISATION ---------------")
 londonGN3 = pd.read_csv('../final_project_data/merge/GN3.csv')
-
+'''
 # PRINT TO SEE OVER TWO WEEKS (to see if day influence)
 x = londonGN3['utc_time']
 y = londonGN3['PM2.5 (ug-m3)']
@@ -89,9 +89,9 @@ plt.show()
 
 print(x)
 print(y)
-
-print(" -------------------- DATA ONE YEAR VISUALISATION ---------------")
 '''
+print(" -------------------- DATA ONE YEAR VISUALISATION ---------------")
+
 # PRINT TO SEE OVER ONE YEAR (too see if th month influences)
 x = londonGN3['utc_time']
 y = londonGN3['PM2.5 (ug-m3)']
@@ -123,5 +123,5 @@ plt.xlabel('utc_time')
 plt.ylabel('NO2 Level')
 plt.title('NO2 over one year : 2017')
 plt.show()
-'''
+
 print("")

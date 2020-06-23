@@ -4,6 +4,7 @@ import sklearn
 import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
+import seaborn as sn
 
 # ALSO :
 # see how to VISUALIZE the datas
@@ -215,6 +216,10 @@ for station in Beijing_AirQuality_Stations_en_csv_formated['stationId']:
     merge_file = merge_file.fillna(merge_file.mean())
 
     merge_final_corr_mat= merge_file.corr()
-    print(merge_final_corr_mat[:][0:5])
+    ax = plt.axes()
+    sn.heatmap(merge_final_corr_mat, annot=True, ax = ax)
+    ax.set_title(station)
+    plt.show()
+    #print(merge_final_corr_mat[:][0:5])
 
     merge_file.to_csv(r'../final_project_data/mergeBeijing/'+station+'.csv', index = False)

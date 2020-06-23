@@ -139,7 +139,7 @@ for s in stations :
     # print('shape y : ', y.shape)
 
 
-    # OPTION 1 : DECALER EN JOURs
+    # OPTION 1 : USE THE DATA FROM TWO DAYS BEFORE TO PREDICT
     # X_train1, X_val1 = X[:200], X[200:300]
     # y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
 
@@ -164,7 +164,7 @@ for s in stations :
     print(y_val1.shape)
     '''
 
-    # OPTION 2 : DECALER EN HEURE
+    # OPTION 2 : USE THE PREVIOUS HOUR TO PREDICT
     #print("option 2 : ")
     # X_train2, X_val2 = X[:200], X[200:300]
     # y_train2, y_val2 = y[1:201], y[201:301]
@@ -187,7 +187,8 @@ for s in stations :
     print(X_val2.shape)
     print(y_val2.shape)
     '''
-    # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
+    # OPTION 3 : USE THE THREE PREVIOUS HOURS TO PREDICT (with separate vectors)
+    # OR USE THE THREE PREVIOUS HOURS TO PREDICT (as one vector)
     #print("option 3 : ")
     # X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
     # X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
@@ -215,6 +216,7 @@ for s in stations :
 
     y_train3, y_val3 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
 
+    # USE THE PREVIOUS HOUR TO PREDICT
     X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
     X_train4_reduc = np.array([X_reduc[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
 
@@ -451,33 +453,11 @@ print('real : ', y_train_app2_total[:20])
 print('pred : ', pred[:20])
 '''
 
-# COMPARER DEUX PLOTS :
-# Y_TEST REELS A PREDIRE
-# Y_TEST QUE NOUS ON A PREDIT
-
-# Calculate probabilities
-#est_prob = est.predict_proba(X_test)
-# Calculate confusion matrix
-#confusion_est = confusion_matrix(y_test,pred)
-#print(confusion_est)
-
 #
 # for i in range(10) :
 #     print("test : ", y_test[i])
 #     print("pred = ", pred[i])
 #
-
-# OR :
-'''
-# https://www.datacareer.ch/blog/parameter-tuning-in-gradient-boosting-gbm-with-python/
-p_test2 = {'max_depth':[2,3,4,5,6,7] }
-p_test3 = {'max_depth':[2,3,4,5,6,7], 'learning_rate':[0.15,0.1,0.05,0.01,0.005,0.001], 'n_estimators':[100,250,500,750,1000,1250,1500,1750]}
-
-tuning = GridSearchCV(estimator =GradientBoostingRegressor(random_state=0, loss = 'ls'),
-            param_grid = p_test3, scoring='neg_mean_squared_error', cv=5)
-tuning.fit(X_train_app,y_train_app1)
-print(tuning.best_params_, tuning.best_score_)
-'''
 
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
@@ -818,7 +798,7 @@ print("----------- END TESTS Multiclass Neural Network  ------------")
 
 print("----------- START TESTS xgboost  ------------")
 
-data_dmatrix = xgb.DMatrix(data=X_train_app_total_reduc,label=y_train_app1_total/1000)
+data_dmatrix = xgb.DMatrix(data=X_train_app_total_reduc,label=abs(y_train_app2_total/1000))
 min_error = 100000
 objective = np.array(["binary:logistic"])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
@@ -858,15 +838,16 @@ print("with subsample : ")
 print(best_sub)
 
 # SIDE NOTE : alpha values could have been tested too -> still not as good as gradient tree boosting
-xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 2) # FOR PM2.5 -> MSE = 16.552617929952707, FOR PM10 -> MSE = 15.86213816059505, FOR O3 -> MSE = 13.451175283521856
-#xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
-xg_reg.fit(X_train_app_total_reduc,y_train_app1_total/1000)
+#xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.7, learning_rate= 0.1, max_depth=1, subsample= 0.9,alpha= 2) # FOR PM2.5 -> MSE = 5.068542680622184
+#xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.7, learning_rate= 0.2, max_depth=3, subsample= 0.9,alpha= 2) # FOR PM10 -> MSE = 7.2823910368198135
+xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
+xg_reg.fit(X_train_app_total_reduc,abs(y_train_app2_total/1000))
 pred = xg_reg.predict(X_train_app_total_reduc)
 pred = pred*1000
-rmse = np.sqrt(mean_squared_error(y_train_app1_total, pred))
+rmse = np.sqrt(mean_squared_error(abs(y_train_app2_total), pred))
 print("mse : ", rmse)
 for i in range(10) :
-    print("test : ", y_train_app1_total[i])
+    print("test : ", abs(y_train_app2_total)[i])
     print("pred = ", pred[i])
 
 

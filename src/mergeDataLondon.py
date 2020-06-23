@@ -2,11 +2,8 @@ import csv
 import numpy as np
 import sklearn
 import pandas as pd
-
-# ALSO :
-# see how to VISUALIZE the datas
-# e.g. plot PMs per month ( overall visualisation, avoir une idée du truc - > dans intro rapport ? )
-# e.g. afficher PMs en fonction de chaque autre donnée qu'on a (un plot par donnée externe)
+import seaborn as sn
+import matplotlib.pyplot as plt
 
 print("------------------------------ LOAD DATA  ------------------------------")
 
@@ -73,9 +70,6 @@ print("")
 print(" -------------------- LOAD London_historical_meo_grid")
 
 meo_grid = pd.read_csv('../../London_historical_meo_grid.csv')
-# TAKES A LOT OF TIME :
-#meo_grid = meo_grid.interpolate(method ='polynomial', order = 2, limit_direction ='forward')
-#meo_grid = meo_grid.fillna(meo_grid.mean())
 
 print("test shape meo_grid: ")
 print(meo_grid.shape)
@@ -153,4 +147,8 @@ for station in airQuality_stations['id']:
     station_merge.to_csv(r'../final_project_data/merge/'+station+'.csv', index = False)
 
     merge_final_corr_mat= station_merge.corr()
-    print(merge_final_corr_mat[0:2][:])
+    ax = plt.axes()
+    sn.heatmap(merge_final_corr_mat, annot=True, ax = ax)
+    ax.set_title(station)
+    plt.show()
+    #print(merge_final_corr_mat[0:2][:])

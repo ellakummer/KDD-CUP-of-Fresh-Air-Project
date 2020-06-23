@@ -53,30 +53,6 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
-
-# https://www.hindawi.com/journals/jece/2017/5106045/
-
-# https://medium.com/mongolian-data-stories/ulaanbaatar-air-pollution-part-1-35e17c83f70b (ici plus discret mdr)
-# https://medium.com/mongolian-data-stories/part-3-the-model-b2fb9a25a07c
-# https://github.com/robertritz/Ulaanbaatar-PM2.5-Prediction/blob/master/Classification%20Model/Ulaanbaatar%20PM2.5%20Prediction%20-%20Classification.ipynb
-
-# transform into array London_historical_aqi_forecast_stations_20180331
-
-# If the wind speed is less than 0.5m/s (nearly no wind), the value of the wind direction is 999017.
-# -> put to 0
-
-# TO PUT NAN TO AVERAGE COLUMN :
-# https://stackoverflow.com/questions/18689235/numpy-array-replace-nan-values-with-average-of-columns
-
-# ALSO :
-# see how to VISUALIZE the datas
-# e.g. plot PMs per month ( overall visualisation, avoir une idée du truc - > dans intro rapport ? )
-# e.g. afficher PMs en fonction de chaque autre donnée qu'on a (un plot par donnée externe)
-
-# MODELS :
-# GradientBoostingRegressor, svm.SVC, RandomForestRegressor, LogisticGAM
-# AND TRY LINEAR REGRESSION TOO
-
 print("----------- LOAD DATAS ------------")
 
 X_train = np.empty([200,3,11])
@@ -139,7 +115,6 @@ for s in stations :
         startDateTest = 9375
         endDateTest = 9420
 
-    # SI ON VEUT CONCAT : SEPARER SELECTION ET NUMPY
     X_test = all.loc[startDateTest:endDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
     X_test_O3 = all.loc[startDateTest:endDateTest-1,['temperature','pressure','humidity','wind_direction','wind_speed','PM10','NO2','CO','O3']].to_numpy()
     X_test_PMs = all.loc[startDateTest:endDateTest-1,['humidity','wind_direction','wind_speed','PM2.5','PM10','NO2','CO','O3','SO2']].to_numpy()
@@ -163,7 +138,7 @@ for s in stations :
     print(X[0]) # tests see right id station
     print(y[0])
     '''
-    # OPTION 1 : DECALER EN JOURs
+    # OPTION 1 : USE THE DATA FROM TWO DAYS BEFORE TO PREDICT
     X_train1, X_val1 = X[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
     X_train1_03, X_val1_03 = X_O3[startDateTest-300-days*24:startDateTest-100-days*24], X_O3[startDateTest-100-days*24:startDateTest-days*24]
     X_train1_PM, X_val1_PM = X_PM[startDateTest-300-days*24:startDateTest-100-days*24], X_O3[startDateTest-100-days*24:startDateTest-days*24]
@@ -179,11 +154,12 @@ for s in stations :
     print(X_val1.shape)
     print(y_val1.shape)
     '''
-    # OPTION 2 : DECALER EN HEURE
+    # OPTION 2 : USE THE PREVIOUS HOUR TO PREDICT
     X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
     X_train2_O3, X_val2_O3 = X_O3[startDateTest-300-1:startDateTest-100-1], X_O3[startDateTest-100-1:startDateTest-1]
     X_train2_PM, X_val2_PM = X_PM[startDateTest-300-1:startDateTest-100-1], X_PM[startDateTest-100-1:startDateTest-1]
     y_train2, y_val2 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
+
     '''
     print(X_train2[0])
     print(X_val2[-1])
@@ -194,7 +170,7 @@ for s in stations :
     print(X_val2.shape)
     print(y_val2.shape)
     '''
-    # OPTION 3 : DECALER EN HEURE AVEC SET DE PREDICTION (3) POUR UN Y
+    # OPTION 3 : USE THE THREE PREVIOUS HOURS TO PREDICT (with separate vectors)
     X_train3= np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_O3 = np.array([np.array([ X_O3[i],X_O3[i+1],X_O3[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_PM = np.array([np.array([ X_PM[i],X_PM[i+1],X_PM[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
@@ -215,6 +191,7 @@ for s in stations :
     print(y_val3[0])
     '''
     '''
+    # USE THE THREE PREVIOUS HOURS TO PREDICT (as one vector)
     X_train4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)])
     X_train4_O3 = np.array([np.append( X_O3[i],np.append(X_O3[i+1],X_O3[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_val4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
@@ -222,6 +199,7 @@ for s in stations :
     X_val4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_train4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     '''
+    # USE THE PREVIOUS HOUR TO PREDICT
     X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
     X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
     X_train4_PM = np.array([X_PM[i] for i in range(startDateTest-300-1,startDateTest-100-1)])
@@ -244,6 +222,11 @@ for s in stations :
     print(X_train4[-1])
     print(X_val4[0])
     '''
+
+    print(" X_train2 : ")
+    print(X_train2)
+    print(" X_train4 : ")
+    print(X_train4)
 
     # concat
     X_train = np.append(X_train, X_train3,axis=0)
@@ -378,7 +361,7 @@ n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 '''
-'''
+
 n_est = np.array([50,100,150,200,250,300,350,400])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1])
 max_depths = np.array([1,2,3])
@@ -389,10 +372,12 @@ for esti in n_est :
             print('esti: ', esti, ' learning_rate : ', lr, ' depth : ', depth)
             est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app_O3, y_train_app3)
             # make cross validation error
-            error = mean_squared_error(y_val_app3, est.predict(X_val_app_O3))
-            #print(error)
-            if error < min_error :
-                min_error = error
+            #error = mean_squared_error(y_val_app3, est.predict(X_val_app_O3))
+
+            cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+            n_scores = cross_val_score(est, X_train_app_O3, y_train_app3, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+            if mean(n_scores) < min_error :
+                min_error = mean(n_scores)
                 best_n_est = esti
                 best_lr = lr
                 best_depth = depth
@@ -409,41 +394,13 @@ print(best_depth)
 est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app_O3, y_train_app3)
 pred = est.predict(X_val_app_O3) # CHANGE IN TEST
 
-# COMPARER DEUX PLOTS :
-# Y_TEST REELS A PREDIRE
-# Y_TEST QUE NOUS ON A PREDIT
-
-# Calculate probabilities
-#est_prob = est.predict_proba(X_test)
-# Calculate confusion matrix
-#confusion_est = confusion_matrix(y_test,pred)
-#print(confusion_est)
-
-
 for i in range(10) :
     print("test : ", y_val_app3[i])
     print("pred = ", pred[i])
-'''
+
 
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
-print("----------- START TESTS : SVM / cross validation ------------")
-# PAS FIFOU HEIN
-# https://scikit-learn.org/stable/modules/cross_validation.html
-# https://scikit-learn.org/stable/modules/svm.html
-#clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
-#clf.score(X_test, y_test)
-'''
-lab_enc = preprocessing.LabelEncoder()
-y_train_encoded = lab_enc.fit_transform(column4)
-
-clf = svm.SVC(kernel='linear', C=1)
-scores = cross_val_score(clf, data_predict_x, y_train_encoded, cv=2)
-print("scores : ")
-print(scores)
-print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-'''
-print("----------- END TESTS SVM / Cross validation ------------")
 
 print("----------- START TESTS : Random Forest ------------")
 # https://machinelearningmastery.com/random-forest-ensemble-in-python/
@@ -659,7 +616,8 @@ print(best_colysample_bytree)
 print("with subsample : ")
 print(best_sub)
 '''
-# SIDE NOTE : alpha values could have been tested too -> still not as good as gradient tree boosting 
+'''
+# SIDE NOTE : alpha values could were tested too -> still not as good as gradient tree boosting
 xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.9, learning_rate= 0.2, max_depth=2, subsample= 0.9,alpha= 2) # FOR PM2.5 -> MSE = 16.552617929952707, FOR PM10 -> MSE = 15.86213816059505, FOR O3 -> MSE = 13.451175283521856
 #xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
 xg_reg.fit(np.append(X_train_app_PM,X_val_app_PM,axis=0),np.append(y_train_app1/1000,y_val_app1/1000,axis=0))
@@ -670,6 +628,6 @@ print("mse : ", rmse)
 for i in range(10) :
     print("test : ", np.append(y_train_app3,y_val_app3,axis=0)[i])
     print("pred = ", pred[i])
-
+'''
 
 print("----------- END TESTS xgboost  ------------")
