@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import pandas as pd
+
 # for random forest
 import sklearn
 from sklearn.datasets import make_regression
@@ -10,21 +11,14 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import RepeatedKFold
 from sklearn.ensemble import RandomForestRegressor
+
 # for gradient boosting
 from sklearn.metrics import mean_squared_error
 from sklearn.datasets import make_friedman1
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import confusion_matrix, classification_report
 
-from sklearn.model_selection import GridSearchCV
-# for SVM with cross validation
-from sklearn.model_selection import train_test_split
-from sklearn import datasets
-from sklearn import svm
-from sklearn.model_selection import cross_val_score
-from sklearn import preprocessing
-from sklearn import utils
-# for GAM (pip3 install pygam)
+# for GAM
 from pygam import GAM, s, f
 from pygam import PoissonGAM
 from pygam import LogisticGAM
@@ -32,7 +26,9 @@ from pygam import LinearGAM
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import log_loss
+from sklearn.model_selection import GridSearchCV
 
+# for Linear Regression
 from sklearn.linear_model import LinearRegression
 
 import warnings
@@ -42,6 +38,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import xgboost as xgb
 from xgboost import XGBRegressor
 
+# for NN
 from sklearn.neural_network import MLPRegressor
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
@@ -49,54 +46,21 @@ from sklearn.model_selection import train_test_split
 # tests
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
+
 # plots
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
-# https://www.hindawi.com/journals/jece/2017/5106045/
-
-# https://medium.com/mongolian-data-stories/ulaanbaatar-air-pollution-part-1-35e17c83f70b (ici plus discret mdr)
-# https://medium.com/mongolian-data-stories/part-3-the-model-b2fb9a25a07c
-# https://github.com/robertritz/Ulaanbaatar-PM2.5-Prediction/blob/master/Classification%20Model/Ulaanbaatar%20PM2.5%20Prediction%20-%20Classification.ipynb
-
-# transform into array London_historical_aqi_forecast_stations_20180331
-
-# If the wind speed is less than 0.5m/s (nearly no wind), the value of the wind direction is 999017.
-# -> put to 0
-
-# TO PUT NAN TO AVERAGE COLUMN :
-# https://stackoverflow.com/questions/18689235/numpy-array-replace-nan-values-with-average-of-columns
-
-# ALSO :
-# see how to VISUALIZE the datas
-# e.g. plot PMs per month ( overall visualisation, avoir une idée du truc - > dans intro rapport ? )
-# e.g. afficher PMs en fonction de chaque autre donnée qu'on a (un plot par donnée externe)
-
-# MODELS :
-# GradientBoostingRegressor, svm.SVC, RandomForestRegressor, LogisticGAM
-# AND TRY LINEAR REGRESSION TOO
 
 print("----------- LOAD DATAS ------------")
-'''
-X_train = np.empty([198,3,8])
-y_train = np.empty([198,2])
-X_val = np.empty([100,3,8])
-y_val = np.empty([100,2])
-'''
 
-# X_train = np.empty([198,3,8])
-# X_train_app = np.empty([198,24])
-#
-# y_train = np.empty([198,2])
-# y_train_app1 = np.empty([198])
-# y_train_app2 = np.empty([198])
-# y_train_app3 = np.empty([198])
+# Initialising the sets
+
 X_train = np.empty([200,3,8])
-X_train_reduc = np.empty([200,3,3])
+X_train_filtered = np.empty([200,3,3])
 
-# X_train_app = np.empty([200,24])
-X_train_app = np.empty([200,8])
-X_train_app_reduc = np.empty([200,3])
+X_train_appended = np.empty([200,8])
+X_train_appended_reduced = np.empty([200,3])
 
 y_train = np.empty([200,2])
 y_train_app1 = np.empty([200])
@@ -105,7 +69,7 @@ y_train_app3 = np.empty([200])
 
 X_val = np.empty([100,3,8])
 X_val_reduc = np.empty([100,3,3])
-# X_val_app = np.empty([100,24])
+
 X_val_app = np.empty([100,8])
 X_val_app_reduc = np.empty([100,3])
 
@@ -115,13 +79,10 @@ y_val_app2 = np.empty([100])
 y_val_app3 = np.empty([100])
 
 days = 2
-# stations = ['BL0', 'BX9', 'CD1', 'CD9', 'CR8', 'CT2', 'CT3', 'GB0', 'GN0', 'GN3', 'GR4', 'GR9', 'HV1', 'KF1', 'LW2', 'MY7', 'RB7', 'ST5', 'TD5', 'TH4']
+
 stations = ['BL0', 'CD1', 'CD9', 'GN0', 'GN3', 'GR4', 'GR9', 'HV1', 'KF1', 'LW2', 'MY7', 'ST5', 'TH4']
-# stations = ['BL0'] # pick one
 for s in stations :
-    #print(s)
     all = pd.read_csv('../final_project_data/merge/'+s+'.csv')
-    #print(all.shape)
     if s == 'CT2' :
         startDateTest = 9240
         endDateTest = 9287
@@ -129,84 +90,25 @@ for s in stations :
         startDateTest = 10656
         endDateTest = 10703
 
-    # SEE YOU LATER TESTS :)
-    #X_test = all.loc[startDateTest:endDateTest,['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
-    #y_test = all.loc[startDateTest:endDateTest,['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     # X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)', 'utc_time']].to_numpy()
     X = all[['temperature','pressure','humidity','wind_direction','wind_speed/kph','PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     X_reduc = all[['PM2.5 (ug-m3)','PM10 (ug-m3)','NO2 (ug-m3)']].to_numpy()
     y = all[['PM2.5 (ug-m3)','PM10 (ug-m3)']].to_numpy()
-    # print('shape y : ', y.shape)
-
 
     # OPTION 1 : USE THE DATA FROM TWO DAYS BEFORE TO PREDICT
-    # X_train1, X_val1 = X[:200], X[200:300]
-    # y_train1, y_val1 = y[days*24:200+days*24], y[200+days*24:300+days*24]
 
     X_train1, X_val1 = X[startDateTest-300-days*24:startDateTest-100-days*24], X[startDateTest-100-days*24:startDateTest-days*24]
     X_train1_reduc, X_val1_reduc = X_reduc[startDateTest-300-days*24:startDateTest-100-days*24], X_reduc[startDateTest-100-days*24:startDateTest-days*24]
     y_train1, y_val1 = X[startDateTest-300:startDateTest-100], X[startDateTest-100:startDateTest]
-    '''
-    print('X_train1[0] : ', X_train1[0])
-    print('X_train1[last] : ', X_train1[-1])
-    print('X_val1[0] : ', X_val1[0])
-    print('X_val1[last] : ', X_val1[-1])
-    print('y_train1[0] : ', y_train1[0])
-    print('y_train1[last] : ', y_train1[-1])
-    print('y_val1[0] : ', y_val1[0])
-    print('y_val1[last] : ', y_val1[-1])
-
-
-    print("option 1 : ")
-    print(X_train1.shape)
-    print(y_train1.shape)
-    print(X_val1.shape)
-    print(y_val1.shape)
-    '''
 
     # OPTION 2 : USE THE PREVIOUS HOUR TO PREDICT
-    #print("option 2 : ")
-    # X_train2, X_val2 = X[:200], X[200:300]
-    # y_train2, y_val2 = y[1:201], y[201:301]
 
     X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
     X_train2_reduc, X_val2_reduc = X_reduc[startDateTest-300-1:startDateTest-100-1], X_reduc[startDateTest-100-1:startDateTest-1]
     y_train2, y_val2 = X[startDateTest-300:startDateTest-100], X[startDateTest-100:startDateTest]
-    '''
-    print('X_train2[0] : ', X_train2[0])
-    print('X_train2[last] : ', X_train2[-1])
-    print('X_val2[0] : ', X_val2[0])
-    print('X_val2[last] : ', X_val2[-1])
-    print('y_train2[0] : ', y_train2[0])
-    print('y_train2[last] : ', y_train2[-1])
-    print('y_val2[0] : ', y_val2[0])
-    print('y_val2[last] : ', y_val2[-1])
 
-    print(X_train2.shape)
-    print(y_train2.shape)
-    print(X_val2.shape)
-    print(y_val2.shape)
-    '''
     # OPTION 3 : USE THE THREE PREVIOUS HOURS TO PREDICT (with separate vectors)
     # OR USE THE THREE PREVIOUS HOURS TO PREDICT (as one vector)
-    #print("option 3 : ")
-    # X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
-    # X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
-    # y_train3, y_val3 = y[3:201], y[201:301]
-    # X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
-    # X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
-    # y_train4,y_val4 = y[3:201,0], y[201:301,0]
-    # y_train5,y_val5 = y[3:201,1], y[201:301,1]
-
-    # X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(200-3+1)]) #0,1,2... 1,2,3.... 197,198,199
-    # X_val3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(198,300-3+1)])
-    # y_train3, y_val3 = y[3:201], y[201:301]
-
-    # X_train4 = np.array([np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(200-3+1)   ]) #0,1,2... 1,2,3.... 197,198,199
-    # X_val4 = np.array([ np.append(X[i],np.append(X[i+1],X[i+2]))for i in range(198,300-3+1)   ])
-    # y_train4,y_val4 = y[3:201,0], y[201:301,0]
-    # y_train5,y_val5 = y[3:201,1], y[201:301,1]
-
 
     X_train3 = np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_reduc = np.array([np.array([ X_reduc[i],X_reduc[i+1],X_reduc[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
@@ -226,35 +128,15 @@ for s in stations :
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
     y_train5, y_val5 = y[startDateTest-300:startDateTest-100,1], y[startDateTest-100:startDateTest,1]
 
-
-    '''
-    print(X_train3[0])
-    print(X_val3[0])
-    print(X_train3.shape)
-    print(y_train3.shape)
-    print(X_val3.shape)
-    print(y_val3.shape)
-
-    print("concat : ")
     X_train = np.append(X_train, X_train3,axis=0)
-    y_train = np.append(y_train, y_train3,axis=0)
-    X_val = np.append(X_val, X_val3,axis=0)
-    y_val = np.append(y_val, y_val3,axis=0)
-    '''
-    #
-    # print(X_train_app.shape)
-    # print(X_train4.shape)
-    X_train = np.append(X_train, X_train3,axis=0)
-    X_train_reduc = np.append(X_train_reduc, X_train3_reduc,axis=0)
+    X_train_filtered = np.append(X_train_filtered, X_train3_reduc,axis=0)
 
-    X_train_app = np.append(X_train_app, X_train4,axis=0)
-    X_train_app_reduc = np.append(X_train_app_reduc, X_train4_reduc,axis=0)
+    X_train_appended = np.append(X_train_appended, X_train4,axis=0)
+    X_train_appended_reduced = np.append(X_train_appended_reduced, X_train4_reduc,axis=0)
 
     y_train = np.append(y_train, y_train3,axis=0)
     y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
     y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
-    #y_train_app3 = np.append(y_train_app3,y_train6,axis=0)
-
 
     X_val = np.append(X_val, X_val3,axis=0)
     X_val_reduc = np.append(X_val_reduc, X_val3_reduc,axis=0)
@@ -266,41 +148,12 @@ for s in stations :
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
 
-
-
-
-    #y_val_app3 = np.append(y_val_app3,y_val6,axis=0)
-
-    # x = range(len(y_train5))
-    # y = y_train5
-    # plt.plot(x,y)
-    # plt.xlabel('utc_time')
-    # plt.ylabel('2.5PM Level')
-    # plt.title('2.5PM from data training : '+ s)
-    # plt.show()
-
-'''
-print("final matrix : ")
-X_train = X_train[198:]
-y_train = y_train[198:]
-X_val= X_val[100:]
-y_val = y_val[100:]
-'''
-
-#print("final matrix : ")
-# X_train = X_train[198:]
-# X_train_app = X_train_app[198:]
-#
-# y_train = y_train[198:]
-# y_train_app1 = y_train_app1[198:]
-# y_train_app2 = y_train_app2[198:]
-# #y_train_app3 = y_train_app3[198:]
-
+# getting the final data on which to train
 X_train = X_train[200:]
-X_train_reduc = X_train_reduc[200:]
+X_train_filtered = X_train_filtered[200:]
 
-X_train_app = X_train_app[200:]
-X_train_app_reduc = X_train_app_reduc[200:]
+X_train_appended = X_train_appended[200:]
+X_train_appended_reduced = X_train_appended_reduced[200:]
 
 y_train = y_train[200:]
 y_train_app1 = y_train_app1[200:]
@@ -315,201 +168,86 @@ X_val_app_reduc = X_val_app_reduc[100:]
 y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
-#y_val_app3 = y_val_app3[100:]
 
-X_train_app_total = np.append(X_train_app, X_val_app, axis=0)
-X_train_app_total_reduc = np.append(X_train_app_reduc, X_val_app_reduc, axis=0)
+# making only training set (for cross validation)
+X_train_appended_total = np.append(X_train_appended, X_val_app, axis=0)
+X_train_appended_total_reduced = np.append(X_train_appended_reduced, X_val_app_reduc, axis=0)
 
-# print(X_train_app.shape)
-# print(X_val_app.shape)
-#
-# print(X_train_app_total.shape)
-# print(X_train_app_total_reduc.shape)
-
-y_train_app1_total = np.append(y_train_app1, y_val_app1, axis=0)
-y_train_app2_total = np.append(y_train_app2, y_val_app2, axis=0)
-
-# print('shape X_train_app : ', X_train_app.shape)
-# print('shape y_train_app1 : ', y_train_app1.shape)
+y_train_PM25_total = np.append(y_train_app1, y_val_app1, axis=0)
+y_train_PM10_total = np.append(y_train_app2, y_val_app2, axis=0)
 
 print("----------- START TESTS : Linerar Regression ------------")
 
-X_train_l = X_train_app_total_reduc
-y_train_l1 = y_train_app1_total
-y_train_l2 = y_train_app2_total
-#X_test_l = X_test
-y_train_l = y_val_app2
+# Applying the best parameters to the model
+X_train_l = X_train_appended_total_reduced
+y_train_l1 = y_train_PM25_total
+y_train_l2 = y_train_PM10_total
 
-# print(X_train_l)
-# for i in range(len(X_train_l)):
-#     print(X_train_l[i])
-
-'''
 print('PM2.5')
 reg = LinearRegression().fit(X_train_l,y_train_l1)
 pred = reg.predict(X_train_l)
 err = mean_squared_error(y_train_l1,pred)
 print('mean error : ', err)
-print('real : ', y_train_l1[:20])
-print('pred : ', pred[:20])
-
-print('###########################################################################')
-print('PM10')
-reg = LinearRegression().fit(X_train_l,y_train_l2)
-pred = reg.predict(X_train_l)
-err = mean_squared_error(y_train_l2,pred)
-print('mean error : ', err)
-print('real : ', y_train_l2[:20])
-print('pred : ', pred[:20])
-'''
-
-#pred = reg.predict(X_test_l)
-#print(pred)
-
-
-
-# COMPARER DEUX PLOTS :
-# Y_TEST REELS A PREDIRE
-# Y_TEST QUE NOUS ON A PREDIT
-
+print('real : ', y_train_l1[:10])
+print('pred : ', pred[:10])
 
 print("----------- END TESTS : Linerar Regression ------------")
 
 print("----------- START TESTS : Gradient Tree Boosting ------------")
-# https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting
 
-# ON SEPARERA ON FONCTION PLUS TARD
+# Determining the best parameters via 10 fold cross validation
 
-#TO FIT : n_estimators, learning rate, AND max_depth
+print('FOR PM2.5')
 
-
-min_error = 10000
-max_score = 1000
-
-'''
 n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600,750,1000,1250,1500,1750])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
-'''
 
-n_est = np.array([250,1000,1750])
-learning_rates = np.array([0.01, 0.1, 0.5])
-max_depths = np.array([1,6,10])
+max_score = -10000000000000000
 
-
-
-'''n_est = np.array([1, 2, 3])
-learning_rates = np.array([0.01, 0.02, 0.03])
-max_depths = np.array([1,2])'''
-
-'''
-print('FOR PM10')
 for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
-            model = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app_total_reduc, y_train_app2_total)
+            model = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_appended_total_reduced, y_train_PM25_total)
             cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-            n_scores = cross_val_score(model, X_train_app_total_reduc, y_train_app2_total, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-            # print(n_scores)
-            if mean(n_scores) < max_score :
+            n_scores = cross_val_score(model, X_train_appended_total_reduced, y_train_PM25_total, scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+            print('parameters - n_estimation : ', esti, ', learning rates : ', lr, ', max depths : ', depth )
+            if mean(n_scores) > max_score :
                 max_score = mean(n_scores)
-                min_error = mean_squared_error(y_train_app2_total, model.predict(X_train_app_total_reduc))
                 best_n_est = esti
                 best_lr = lr
                 best_depth = depth
-            # #print(error)
-            # if error < min_error :
-            #     min_error = error
-            #     best_n_est = esti
-            #     best_lr = lr
-            #     best_depth = depth
 
 print("best mean squared error : ")
-print(min_error)
+print(max_score)
 print("with n_estimators : ")
 print(best_n_est)
 print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-'''
 
-'''
-print('PM2.5')
-est = GradientBoostingRegressor(n_estimators=1750, learning_rate=0.5, max_depth=6, random_state=0, loss='ls').fit(X_train_app_total_reduc, y_train_app1_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app1_total,pred)
+# Applying the best parameters to the model
+est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_appended_total_reduced, y_train_PM25_total)
+pred = est.predict(X_train_appended_total_reduced)
+error = mean_squared_error(y_train_PM25_total,pred)
 print('mean error : ', error)
-print('real : ', y_train_app1_total[:20])
-print('pred : ', pred[:20])
-
-print('###########################################################################')
-print('PM10')
-est = GradientBoostingRegressor(n_estimators=1750, learning_rate=0.5, max_depth=6, random_state=0, loss='ls').fit(X_train_app_total_reduc, y_train_app2_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app2_total,pred)
-print('mean error : ', error)
-print('real : ', y_train_app2_total[:20])
-print('pred : ', pred[:20])
-'''
-
-#
-# for i in range(10) :
-#     print("test : ", y_test[i])
-#     print("pred = ", pred[i])
-#
+print('real : ', y_train_PM25_total[:10])
+print('pred : ', pred[:10])
 
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
-print("----------- START TESTS : SVM / cross validation ------------")
-# PAS FIFOU HEIN
-# https://scikit-learn.org/stable/modules/cross_validation.html
-# https://scikit-learn.org/stable/modules/svm.html
-#clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
-#clf.score(X_test, y_test)
-'''
-lab_enc = preprocessing.LabelEncoder()
-y_train_encoded = lab_enc.fit_transform(column4)
-
-clf = svm.SVC(kernel='linear', C=1)
-scores = cross_val_score(clf, data_predict_x, y_train_encoded, cv=2)
-print("scores : ")
-print(scores)
-print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-'''
-print("----------- END TESTS SVM / Cross validation ------------")
-
 print("----------- START TESTS : Random Forest ------------")
-# https://machinelearningmastery.com/random-forest-ensemble-in-python/
-'''
-we will evaluate the model using repeated k-fold cross-validation,
-with three repeats and 10 folds. We will report the mean absolute error (MAE)
-of the model across all repeats and folds. The scikit-learn library makes the
-MAE negative so that it is maximized instead of minimized.
-This means that larger negative MAE are better and a perfect model has a MAE of 0.
-'''
-'''
 
-max_score = 0
+# Determining the best parameters via 10 fold cross validation
 
-# TO SET PARAMETERS
+print('FOR PM2.5')
 max_sample = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, None])
-max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
-n_estimator = np.array([10, 50, 100, 200, 300, 400, 500]) # sdet tp 100 by default
+max_feature = np.array([1,2])
+n_estimator = np.array([10, 50, 100, 200, 300, 400, 500])
 max_depth = np.array([None,1,2,3,4,5,6,7])
 
-# TESTS
-
-'''
-
-'''
-print('FOR PM2.5')
-max_sample = np.array([0.1, 0.4, 0.7, 0.9])
-max_feature = np.array([1,2]) # defaults to the square root of the number of input features -> augmenter quand tous
-n_estimator = np.array([50, 200, 300, 400]) # sdet tp 100 by default
-max_depth = np.array([None,1,3,5,7])
-
-max_score = 0
+max_score = -100000000000000000
 
 for max_samp in max_sample :
     for max_feat in max_feature :
@@ -517,17 +255,15 @@ for max_samp in max_sample :
             for n in n_estimator :
                 model = RandomForestRegressor(max_samples = max_samp, max_features = max_feat, n_estimators = n, max_depth = max_dep)
                 cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-                n_scores = cross_val_score(model, X_train_app_total_reduc, y_train_app1_total, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-                if mean(n_scores) < max_score :
-                    model.fit(X_train_app_total_reduc, y_train_app1_total)
-                    min_error = mean_squared_error(y_train_app1_total, model.predict(X_train_app_total_reduc))
+                n_scores = cross_val_score(model, X_train_appended_total_reduced, y_train_PM25_total, scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+                if mean(n_scores) > max_score :
                     max_score = mean(n_scores)
                     best_n_est = n
                     best_max_sample = max_samp
                     best_max_feature = max_feat
                     best_max_depth = max_dep
 
-print('Best mean error : ', min_error)
+print('Best mean error : ', max_score)
 print("best n_estimator : ")
 print(best_n_est)
 print("best max_feature : ")
@@ -536,275 +272,80 @@ print("best max_sample : ")
 print(best_max_sample)
 print("best max_depth : ")
 print(best_max_depth)
-'''
 
-'''
-print("results cross-validation error w/ best parameters :"")
+# Applying the best parameters to the model
 
-# X, y = data_predict_x, column4
 model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
-cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-n_scores = cross_val_score(model, X_train_app_reduc, y_train_app2, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-print('MAE: %.3f (%.3f)' % (mean(n_scores), std(n_scores)))
-# print(y_train_app1.shape)
-'''
-
-'''
-print("prediciton...")
-# model = RandomForestRegressor(max_samples = best_max_sample, max_features = best_max_feature, n_estimators = best_n_est, max_depth = best_max_depth)
-model = RandomForestRegressor(max_samples = 0.9, max_features = 1, n_estimators = 300, max_depth = 30)
-model.fit(X_train_app_total_reduc, y_train_app2_total)
-pred = model.predict(X_train_app_total_reduc)
-#
-print('predicted :', pred[:20])
-print('real : ', y_train_app2_total[:20])
-print('mean error : ', mean_squared_error(y_train_app2_total, pred))
-'''
-
-'''
-print('PM2.5')
-est = RandomForestRegressor(max_samples = 0.9, max_features = 1, n_estimators = 50, max_depth = 30).fit(X_train_app_total_reduc, y_train_app1_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app1_total,pred)
+model.fit(X_train_appended_total_reduced, y_train_PM25_total)
+pred = model.predict(X_train_appended_total_reduced)
+error = mean_squared_error(y_train_PM25_total,pred)
 print('mean error : ', error)
-print('real : ', y_train_app1_total[:20])
-print('pred : ', pred[:20])
-
-print('###########################################################################')
-print('PM10')
-est = RandomForestRegressor(max_samples = 0.9, max_features = 1, n_estimators = 300, max_depth = 30).fit(X_train_app_total_reduc, y_train_app2_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app2_total,pred)
-print('mean error : ', error)
-print('real : ', y_train_app2_total[:20])
-print('pred : ', pred[:20])
-'''
-
-
-'''
-y_test_pred = model.predict(X_test)
-mean_sq_err = mean_squared_error(y_test_pred, y_test)
-print("Mean squared error : ")
-print(mean_sq_err)
-print('Prediction[0]: %d' % yhat[0])
-print('Should predict : %d' %y_test[0])
-print('Prediction[1]: %d' % yhat[1])
-print('Should predict : %d' %y_test[1])
-'''
+print('predicted :', pred[:10])
+print('real : ', y_train_PM25_total[:10])
 
 print("----------- END TESTS Random Forest ------------")
 
 print("----------- START TEST : GAM (generalized additive model) ------------")
-# https://medium.com/just-another-data-scientist/building-interpretable-models-with-generalized-additive-models-in-python-c4404eaf5515
-# The common models are LinearGAM, LogisticGAM, PoissonGAM, GammaGAM, InvGuss.
 
-# OMG DES SAUVEURS :
-'''
-Find the best model requires the tuning of several key parameters including
-n_splines, lam, and constraints.
-Among them, lam is of great importance to the performance of GAMs.
-It controls the strength of the regularization penalty on each term.
-
-yGAM built a grid search function that build a grid to search over multiple lam
-values so that the model with the lowest generalized cross-validation (GCV) score.
-
-n_splines refers to the number of splines to use in each of the smooth function that is going to be fitted.
-
-lam is the penalization term that is multiplied to the second derivative in the overall objective function.
-
-constraints is a list of constraints that allows the user to specify whether a
-function should have a monotonically constraint. This needs to be a string
-in [‘convex’, ‘concave’, ‘monotonic_inc’, ‘monotonic_dec’,’circular’, ‘none’]
-'''
-
-'''
-boston = load_boston()
-df = pd.DataFrame(boston.data, columns=boston.feature_names)
-target_df = pd.Series(boston.target)
-df.head()
-
-X = df.fillna(df.mean()) # combined X = df, X = X.fillna(X.mean())
-y = target_df.fillna(target_df.mean())
-X = X.to_numpy()
-y = y.to_numpy()
-
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-'''
-'''
-# set model : OVER CONSTRAINT, LAM, SPLINES
-gam = LinearGAM(n_splines=10).gridsearch(X_train_app_reduc, y_train_app2)
-#gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
-#gam.summary()
-
-#prediction :
-predictions = gam.predict(X_val_app_reduc)
-print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app1, predictions), y.shape[0]))
-'''
-
-'''
+# Applying the best parameters to the model
 print('PM2.5')
-est = LinearGAM(n_splines=10).gridsearch(X_train_app_total_reduc, y_train_app1_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app1_total,pred)
+est = LinearGAM(n_splines=10).gridsearch(X_train_appended_total_reduced, y_train_PM25_total)
+pred = est.predict(X_train_appended_total_reduced)
+error = mean_squared_error(y_train_PM25_total,pred)
 print('mean error : ', error)
-print('real : ', y_train_app1_total[:20])
-print('pred : ', pred[:20])
-
-print('###########################################################################')
-print('PM10')
-est = LinearGAM(n_splines=10).gridsearch(X_train_app_total_reduc, y_train_app2_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app2_total,pred)
-print('mean error : ', error)
-print('real : ', y_train_app2_total[:20])
-print('pred : ', pred[:20])
-'''
-
-
-'''
-print("y val real : ")
-print(y_val_app2)
-print("predictions : ")
-print(predictions)
-'''
-
-#y_test=y_test.astype('int')
-#predictions=predictions.astype('int')
-#print("Log Loss: {} ".format(log_loss(y_test, predictions)))
-
-'''
-XX = gam.generate_X_grid(term=1)
-plt.rcParams['figure.figsize'] = (28, 8)
-fig, axs = plt.subplots(1, len(boston.feature_names[0:6]))
-titles = boston.feature_names
-for i, ax in enumerate(axs):
-    #pdep, confi = gam.partial_dependence(XX, feature=i+1, width=.95)
-    pdep, confi = gam.partial_dependence(XX, width=.95)
-    ax.plot(XX[:, i], pdep)
-    ax.plot(XX[:, i], confi[0][:, 0], c='grey', ls='--')
-    ax.plot(XX[:, i], confi[0][:, 1], c='grey', ls='--')
-    ax.set_title(titles[i],fontsize=26)
-plt.show()
-'''
+print('real : ', y_train_PM25_total[:10])
+print('pred : ', pred[:10])
 
 print("----------- END TESTS GAM ------------")
 
 print("----------- START TESTS Multiclass Neural Network  ------------")
-'''
-C_mat = data_predict_x.corr()
-fig = plt.figure(figsize = (15,15))
-'''
-'''
-for i in range(10) :
-    print("test : ", y_test[i])
-    print("pred = ", pred[i])
-'''
 
-'''
+# Determining the best parameters via 10 fold cross validation
+
 print('FOR PM2.5')
-max_score = 0
+
+max_score = -1000000000000
 
 max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
 activation = ['relu']
 
 for it in max_iter:
     for acti in activation:
-        #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
-        model = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app_total_reduc, y_train_app1_total)
+        model = MLPRegressor(max_iter = it, activation = acti).fit(X_train_appended_total_reduced, y_train_PM25_total)
         cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-        n_scores = cross_val_score(model, X_train_app_total_reduc, y_train_app1_total, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-        if mean(n_scores) < max_score :
-            model.fit(X_train_app_total_reduc, y_train_app1_total)
-            min_error = mean_squared_error(y_train_app1_total, model.predict(X_train_app_total_reduc))
+        n_scores = cross_val_score(model, X_train_appended_total_reduced, y_train_PM25_total, scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+        if mean(n_scores) > max_score :
             max_score = mean(n_scores)
             best_it = it
             best_acti = acti
-        # if (err < error):
-        #     error = err
-        #     best_it = it
-        #     best_acti = acti
 
-
-print('Best min error : ', min_error)
+print('Best min error : ', max_score)
 print('best it : ', best_it)
 print('best acti : ', best_acti)
 
-model = MLPRegressor(max_iter = best_it, activation = best_acti).fit(X_train_app_total_reduc, y_train_app1_total)
-pred = model.predict(X_train_app_total_reduc)
+# Applying the best parameters to the model
 
-print('predicted :', pred[:20])
-print('real : ', y_train_app1_total[:20])
-print('mean error predicted: ', mean_squared_error(y_train_app1_total, pred))
-
-
-print('########################################################################')
-print('FOR PM10')
-
-max_score = 0
-
-max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
-activation = ['relu']
-
-for it in max_iter:
-    for acti in activation:
-        #regr = MLPRegressor(solver = 'sgd', max_iter = it).fit(X_train_app, y_train_app1)
-        model = MLPRegressor(max_iter = it, activation = acti).fit(X_train_app_total_reduc, y_train_app2_total)
-        cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-        n_scores = cross_val_score(model, X_train_app_total_reduc, y_train_app2_total, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-        if mean(n_scores) < max_score :
-            model.fit(X_train_app_total_reduc, y_train_app2_total)
-            min_error = mean_squared_error(y_train_app2_total, model.predict(X_train_app_total_reduc))
-            max_score = mean(n_scores)
-            best_it = it
-            best_acti = acti
-        # if (err < error):
-        #     error = err
-        #     best_it = it
-        #     best_acti = acti
-
-
-print('Best min error : ', min_error)
-print('best it : ', best_it)
-print('best acti : ', best_acti)
-
-model = MLPRegressor(max_iter = best_it, activation = best_acti).fit(X_train_app_total_reduc, y_train_app2_total)
-pred = model.predict(X_train_app_total_reduc)
-
-print('predicted :', pred[:20])
-print('real : ', y_train_app2_total[:20])
-print('mean error predicted: ', mean_squared_error(y_train_app2_total, pred))
-'''
-
-'''
-print('PM2.5')
-est = MLPRegressor(max_iter = 1150, activation = 'relu').fit(X_train_app_total_reduc, y_train_app1_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app1_total,pred)
+model = MLPRegressor(max_iter = best_it, activation = best_acti).fit(X_train_appended_total_reduced, y_train_PM25_total)
+pred = model.predict(X_train_appended_total_reduced)
+error = mean_squared_error(y_train_PM25_total,pred)
 print('mean error : ', error)
-print('real : ', y_train_app1_total[:20])
-print('pred : ', pred[:20])
-
-print('###########################################################################')
-print('PM10')
-est = MLPRegressor(max_iter = 800, activation = 'relu').fit(X_train_app_total_reduc, y_train_app2_total)
-pred = est.predict(X_train_app_total_reduc)
-error = mean_squared_error(y_train_app2_total,pred)
-print('mean error : ', error)
-print('real : ', y_train_app2_total[:20])
-print('pred : ', pred[:20])
-'''
+print('predicted :', pred[:10])
+print('real : ', y_train_PM25_total[:10])
 
 print("----------- END TESTS Multiclass Neural Network  ------------")
 
 print("----------- START TESTS xgboost  ------------")
 
-data_dmatrix = xgb.DMatrix(data=X_train_app_total_reduc,label=abs(y_train_app2_total/1000))
+# Determining the best parameters via 10 fold cross validation
+
+data_dmatrix = xgb.DMatrix(data=X_train_appended_total_reduced,label=abs(y_train_PM10_total/1000))
 min_error = 100000
 objective = np.array(["binary:logistic"])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 colsample_bytree = np.array([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 subsample = np.array([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9])
+
 for obj in objective:
     for max_dep in max_depths:
         for cb in colsample_bytree:
@@ -812,7 +353,6 @@ for obj in objective:
                 for sub in subsample:
                     params = {'objective': obj,'colsample_bytree': cb,'learning_rate': lr,'max_depth': max_dep,'subsample': sub,'alpha': 10}
                     cv_results = xgb.cv(dtrain=data_dmatrix, params=params, nfold=10, num_boost_round=50,early_stopping_rounds=10,metrics="rmse", as_pandas=True, seed=123)
-                    #print(cv_results.head())
                     print((cv_results["test-rmse-mean"]).tail(1))
                     error = (cv_results["test-rmse-mean"]).tail(1).values[0]
                     if error < min_error :
@@ -837,18 +377,16 @@ print(best_colysample_bytree)
 print("with subsample : ")
 print(best_sub)
 
-# SIDE NOTE : alpha values could have been tested too -> still not as good as gradient tree boosting
-#xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.7, learning_rate= 0.1, max_depth=1, subsample= 0.9,alpha= 2) # FOR PM2.5 -> MSE = 5.068542680622184
-#xg_reg = xgb.XGBRegressor(objective= 'binary:logistic', colsample_bytree= 0.7, learning_rate= 0.2, max_depth=3, subsample= 0.9,alpha= 2) # FOR PM10 -> MSE = 7.2823910368198135
+# Applying the best parameters to the model
+
 xg_reg = xgb.XGBRegressor(objective= best_objective, colsample_bytree= best_colysample_bytree, learning_rate= best_lr, max_depth=best_depth, subsample= best_sub,alpha= 10) # FOR y_PM10
-xg_reg.fit(X_train_app_total_reduc,abs(y_train_app2_total/1000))
-pred = xg_reg.predict(X_train_app_total_reduc)
+xg_reg.fit(X_train_appended_total_reduced,abs(y_train_PM10_total/1000))
+pred = xg_reg.predict(X_train_appended_total_reduced)
 pred = pred*1000
-rmse = np.sqrt(mean_squared_error(abs(y_train_app2_total), pred))
+rmse = np.sqrt(mean_squared_error(abs(y_train_PM10_total), pred))
 print("mse : ", rmse)
 for i in range(10) :
-    print("test : ", abs(y_train_app2_total)[i])
+    print("test : ", abs(y_train_PM10_total)[i])
     print("pred = ", pred[i])
-
 
 print("----------- END TESTS xgboost  ------------")
