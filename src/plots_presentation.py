@@ -48,6 +48,8 @@ plt.show()
 ''
 '''
 print(" -------------------- DATAT THREE WEEK VISUALISATION ---------------")
+'''
+# day of the week influences ?
 londonGN3 = pd.read_csv('../final_project_data/merge/GN3.csv')
 
 # PRINT TO SEE OVER TWO WEEKS (to see if day influence)
@@ -109,9 +111,72 @@ ax2.plot(x2, y2)
 ax3.plot(x3, y3)
 plt.show()
 '''
+print(" -------------------- DATAT ONE DAY VISUALISATION ---------------")
+londonBL0 = pd.read_csv('../final_project_data/merge/BL0.csv')
+
+# hour of the day influences ?
+# PRINT TO SEE OVER TWO WEEKS (to see if day influence)
+fig, (ax1, ax2, ax3) = plt.subplots(3)
+fig.suptitle('3 days PM2.5 for BL0 ')
+ax3.set_xlabel('utc_time')
+ax1.set_ylabel('day 3 PM2.5 Level')
+ax2.set_ylabel('day 2 PM2.5 Level')
+ax3.set_ylabel('day 1 PM2.5 Level')
+x = londonBL0['utc_time']
+y = londonBL0['PM2.5 (ug-m3)']
+x1 = x[3720:3744]
+y1 = y[3720:3744]
+x2 = x[3744:3768]
+y2 = y[3744:3768]
+x3 = x[3768:3792]
+y3 = y[3768:3792]
+ax1.plot(x1, y1)
+ax2.plot(x2, y2)
+ax3.plot(x3, y3)
+plt.show()
+
+
+fig, (ax1, ax2, ax3) = plt.subplots(3)
+fig.suptitle('3 days PM10 for BL0 ')
+ax3.set_xlabel('utc_time')
+ax1.set_ylabel('day 3 PM2.5 Level')
+ax2.set_ylabel('day 2 PM2.5 Level')
+ax3.set_ylabel('day 1 PM2.5 Level')
+x = londonBL0['utc_time']
+y = londonBL0['PM10 (ug-m3)']
+x1 = x[3720:3744]
+y1 = y[3720:3744]
+x2 = x[3744:3768]
+y2 = y[3744:3768]
+x3 = x[3768:3792]
+y3 = y[3768:3792]
+ax1.plot(x1, y1)
+ax2.plot(x2, y2)
+ax3.plot(x3, y3)
+plt.show()
+
+fig, (ax1, ax2, ax3) = plt.subplots(3)
+fig.suptitle('3 days NO2 for BL0 ')
+ax3.set_xlabel('utc_time')
+ax1.set_ylabel('day 3 PM2.5 Level')
+ax2.set_ylabel('day 2 PM2.5 Level')
+ax3.set_ylabel('day 1 PM2.5 Level')
+x = londonBL0['utc_time']
+y = londonBL0['NO2 (ug-m3)']
+x1 = x[3720:3744]
+y1 = y[3720:3744]
+x2 = x[3744:3768]
+y2 = y[3744:3768]
+x3 = x[3768:3792]
+y3 = y[3768:3792]
+ax1.plot(x1, y1)
+ax2.plot(x2, y2)
+ax3.plot(x3, y3)
+plt.show()
+
 '''
 print(" -------------------- DATA ONE YEAR VISUALISATION ---------------")
-'''
+
 # PRINT TO SEE OVER ONE YEAR (too see if th month influences)
 x = londonGN3['utc_time']
 y = londonGN3['PM2.5 (ug-m3)']
