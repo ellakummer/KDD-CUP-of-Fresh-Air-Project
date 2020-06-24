@@ -50,7 +50,7 @@ import matplotlib.pyplot as plt
 print("----------------------------- LONDON ---------------------------------")
 
 print("---------------------------PREDICT ---------------------------------")
-'''
+
 stations = ['BL0', 'CD1', 'CD9', 'GN0', 'GN3', 'GR4', 'GR9', 'HV1', 'KF1', 'LW2', 'MY7', 'ST5', 'TH4']
 # stations = ['BL0'] # pick one
 for s in stations :
@@ -110,7 +110,7 @@ for s in stations :
     ax1.plot(x, pred_PM10)
     ax2.plot(x, y_test_PM10)
     plt.show()
-'''
+
 
 '''
 ---------------------------------- BEIJING -------------------------------------

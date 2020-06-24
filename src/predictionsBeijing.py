@@ -82,7 +82,12 @@ y_val_app3 = np.empty([100])
 
 
 days = 2
-
+stationsStart1 = ['zhiwuyuan','dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','yungang','gucheng','yizhuang','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
+stationsStart2 = ['yanqing','shunyi','daxing','pingchang','miyun']
+stationsStart3 = ['pinggu']
+stationsStart4 = ['mentougou']
+stationsStart5 = ['tongzhou','huairou','fengtaihuayuan']
+stationsStart6 = ['fangshan']
 stations = ['dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','fengtaihuayuan','yungang','gucheng','fangshan','daxing','yizhuang','tongzhou','shunyi','pingchang','mentougou','pinggu','huairou','miyun','yanqing','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
 
 for s in stations :
@@ -350,7 +355,7 @@ print('best acti : ', best_acti)
 # Applying the best parameters to the model
 
 model = MLPRegressor(max_iter = best_it, activation = best_acti).fit( X_train_val_PM, y_train_val1)
-pred = model.predict X_train_val_PM)
+pred = model.predict(X_train_val_PM)
 error = mean_squared_error(y_train_val1)
 print('mean error : ', error)
 print('predicted :', pred[:10])

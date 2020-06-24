@@ -1,19 +1,14 @@
 README
 
-mergeData.py :
+mergeDataLondon.py & mergeDataBeijing.py :
 	merge all data in one file for each station.
 
-loadData.py :
+loadDataLondon.py & loadDataBeijing.py:
 	open merged csv for each station and prepare the training, validation and tests sets. 
+	(the code is used in predictions*.py files to have the right data to predict).
 
-plotsPmsNO2.py : 
-	plot PM2.5, PM10, NO2 for :
-		- small perdiod -> see interpolation
-		- two weeks -> see the day of the week influences
-		- one year -> see of the month influences
+predictionsLondon.py & predictionsBeijing.py : 
+	try the differents predictions techiques on the training and validation tests, computes 	the hyperparamters and the mean squared errors. 
 
-predictionsTech.py : 
-	try the differents predictions techiques 
-
-
-test.py, mergeDataTest.py, loadDataTest.py : tests
+finalModel.py : 
+	Compute the final predictions on test data with the best model. 
