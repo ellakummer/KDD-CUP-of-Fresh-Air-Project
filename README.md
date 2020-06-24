@@ -11,7 +11,7 @@ Report_final_project_datamining.pdf : final report.
 
 ---- JUST FOR THE PROJECT OWNERS ----
 
-correlation_matrxix : contains the correlations matrix for the features of the data.
+correlation_matrix : contains the correlations matrix for the features of the data.
 
 london_plot_prediction : contains some plot of final results. 
 
