@@ -115,7 +115,12 @@ for s in stations :
 '''
 ---------------------------------- BEIJING -------------------------------------
 '''
-
+stationsStart1 = ['zhiwuyuan','dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','yungang','gucheng','yizhuang','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
+stationsStart2 = ['yanqing','shunyi','daxing','pingchang','miyun']
+stationsStart3 = ['pinggu']
+stationsStart4 = ['mentougou']
+stationsStart5 = ['tongzhou','huairou','fengtaihuayuan']
+stationsStart6 = ['fangshan']
 stations = ['dongsi','tiantan','guanyuan','wanshouxigong','aotizhongxin','nongzhanguan','wanliu','beibuxinqu','fengtaihuayuan','yungang','gucheng','fangshan','daxing','yizhuang','tongzhou','shunyi','pingchang','mentougou','pinggu','huairou','miyun','yanqing','dingling','badaling','miyunshuiku','donggaocun','yongledian','yufa','liulihe','qianmen','yongdingmennei','xizhimenbei','nansanhuan','dongsihuan']
 for s in stations :
     all = pd.read_csv('../final_project_data/mergeBeijing/'+s+'.csv')
@@ -198,10 +203,10 @@ for s in stations :
     ax2.plot(x, y_test_PM10)
     plt.show()
     fig, (ax1, ax2) = plt.subplots(2)
-    fig.suptitle('PM10 for station ' + s)
+    fig.suptitle('O3 for station ' + s)
     ax2.set_xlabel('utc_time')
-    ax1.set_ylabel('predicted PM10 Level')
-    ax2.set_ylabel('real values PM10 Level')
-    ax1.plot(x, pred_PM10)
-    ax2.plot(x, y_test_PM10)
+    ax1.set_ylabel('predicted O3 Level')
+    ax2.set_ylabel('real values O3 Level')
+    ax1.plot(x, pred_O3)
+    ax2.plot(x, y_test_O3)
     plt.show()
