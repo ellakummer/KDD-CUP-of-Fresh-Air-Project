@@ -128,22 +128,18 @@ for s in stations :
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
     y_train5, y_val5 = y[startDateTest-300:startDateTest-100,1], y[startDateTest-100:startDateTest,1]
 
+    # concat
     X_train = np.append(X_train, X_train3,axis=0)
     X_train_filtered = np.append(X_train_filtered, X_train3_reduc,axis=0)
-
     X_train_appended = np.append(X_train_appended, X_train4,axis=0)
     X_train_appended_reduced = np.append(X_train_appended_reduced, X_train4_reduc,axis=0)
-
     y_train = np.append(y_train, y_train3,axis=0)
     y_train_app1 = np.append(y_train_app1,y_train4,axis=0)
     y_train_app2 = np.append(y_train_app2,y_train5,axis=0)
-
     X_val = np.append(X_val, X_val3,axis=0)
     X_val_reduc = np.append(X_val_reduc, X_val3_reduc,axis=0)
-
     X_val_app = np.append(X_val_app, X_val4,axis=0)
     X_val_app_reduc = np.append(X_val_app_reduc, X_val4_reduc,axis=0)
-
     y_val = np.append(y_val, y_val3,axis=0)
     y_val_app1 = np.append(y_val_app1,y_val4,axis=0)
     y_val_app2 = np.append(y_val_app2,y_val5,axis=0)
@@ -169,12 +165,11 @@ y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
 
-# making only training set (for cross validation)
+# concatenate training and validation test :
 X_train_appended_total = np.append(X_train_appended, X_val_app, axis=0)
 X_train_appended_total_reduced = np.append(X_train_appended_reduced, X_val_app_reduc, axis=0)
-
-y_train_PM25_total = np.append(y_train_app1, y_val_app1, axis=0)
-y_train_PM10_total = np.append(y_train_app2, y_val_app2, axis=0)
+y_train_PM25_total = np.append(y_train_app1, y_val_app1, axis=0) # predict PM2.5
+y_train_PM10_total = np.append(y_train_app2, y_val_app2, axis=0) # predict PM10
 
 print("----------- START TESTS : Linerar Regression ------------")
 
@@ -228,6 +223,7 @@ print("with max_depth : ")
 print(best_depth)
 
 # Applying the best parameters to the model
+
 est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_appended_total_reduced, y_train_PM25_total)
 pred = est.predict(X_train_appended_total_reduced)
 error = mean_squared_error(y_train_PM25_total,pred)
@@ -307,7 +303,7 @@ print('FOR PM2.5')
 max_score = -1000000000000
 
 max_iter =  [800, 850, 900, 950, 1000, 1050, 1100, 1150 ]
-activation = ['relu']
+activation = ['identity', 'logistic', 'tanh', 'relu']
 
 for it in max_iter:
     for acti in activation:
