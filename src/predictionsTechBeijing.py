@@ -154,23 +154,8 @@ for s in stations :
     print(X_val1.shape)
     print(y_val1.shape)
     '''
-    # OPTION 2 : USE THE PREVIOUS HOUR TO PREDICT
-    X_train2, X_val2 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
-    X_train2_O3, X_val2_O3 = X_O3[startDateTest-300-1:startDateTest-100-1], X_O3[startDateTest-100-1:startDateTest-1]
-    X_train2_PM, X_val2_PM = X_PM[startDateTest-300-1:startDateTest-100-1], X_PM[startDateTest-100-1:startDateTest-1]
-    y_train2, y_val2 = y[startDateTest-300:startDateTest-100], y[startDateTest-100:startDateTest]
 
-    '''
-    print(X_train2[0])
-    print(X_val2[-1])
-    print(y_train2[0])
-    print(y_val2[-1])
-    print(X_train2.shape)
-    print(y_train2.shape)
-    print(X_val2.shape)
-    print(y_val2.shape)
-    '''
-    # OPTION 3 : USE THE THREE PREVIOUS HOURS TO PREDICT (with separate vectors)
+    # OPTION 2 : USE THE THREE PREVIOUS HOURS TO PREDICT (with separate vectors)
     X_train3= np.array([np.array([ X[i],X[i+1],X[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_O3 = np.array([np.array([ X_O3[i],X_O3[i+1],X_O3[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_train3_PM = np.array([np.array([ X_PM[i],X_PM[i+1],X_PM[i+2]])for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
@@ -191,7 +176,7 @@ for s in stations :
     print(y_val3[0])
     '''
     '''
-    # USE THE THREE PREVIOUS HOURS TO PREDICT (as one vector)
+    # OPTION3 : USE THE THREE PREVIOUS HOURS TO PREDICT (as one vector)
     X_train4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)])
     X_train4_O3 = np.array([np.append( X_O3[i],np.append(X_O3[i+1],X_O3[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     X_val4 = np.array([np.append( X[i],np.append(X[i+1],X[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
@@ -199,13 +184,10 @@ for s in stations :
     X_val4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-100-3,startDateTest-3+1-1)])
     X_train4_PM = np.array([np.append( X_PM[i],np.append(X_PM[i+1],X_PM[i+2]))for i in range(startDateTest-300-3,startDateTest-100-3)]) #0,1,2... 1,2,3.... 197,198,199
     '''
-    # USE THE PREVIOUS HOUR TO PREDICT
-    X_train4 = np.array([X[i] for i in range(startDateTest-300-1,startDateTest-100-1)]) #0,1,2... 1,2,3.... 197,198,199
-    X_val4 = np.array([X[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
-    X_train4_PM = np.array([X_PM[i] for i in range(startDateTest-300-1,startDateTest-100-1)])
-    X_val4_PM = np.array([X_PM[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
-    X_train4_O3 = np.array([X_O3[i] for i in range(startDateTest-300-1,startDateTest-100-1)])
-    X_val4_O3 = np.array([X_O3[i] for i in range(startDateTest-100-1,startDateTest-1+1-1)])
+    # OPTION 4 : USE THE PREVIOUS HOUR TO PREDICT
+    X_train4, X_val4 = X[startDateTest-300-1:startDateTest-100-1], X[startDateTest-100-1:startDateTest-1]
+    X_train4_O3, X_val4_O3 = X_O3[startDateTest-300-1:startDateTest-100-1], X_O3[startDateTest-100-1:startDateTest-1]
+    X_train4_PM, X_val4_PM = X_PM[startDateTest-300-1:startDateTest-100-1], X_PM[startDateTest-100-1:startDateTest-1]
 
     y_train4, y_val4 = y[startDateTest-300:startDateTest-100,0], y[startDateTest-100:startDateTest,0]
     y_train5, y_val5 = y[startDateTest-300:startDateTest-100,1], y[startDateTest-100:startDateTest,1]
@@ -222,11 +204,6 @@ for s in stations :
     print(X_train4[-1])
     print(X_val4[0])
     '''
-
-    print(" X_train2 : ")
-    print(X_train2)
-    print(" X_train4 : ")
-    print(X_train4)
 
     # concat
     X_train = np.append(X_train, X_train3,axis=0)
@@ -302,6 +279,14 @@ y_val = y_val[100:]
 y_val_app1 = y_val_app1[100:]
 y_val_app2 = y_val_app2[100:]
 y_val_app3 = y_val_app3[100:]
+# concatenate training and validation test : 
+X_train_val_PM = np.append(X_train_app_PM,X_val_app_PM,axis=0)
+X_train_val_O3 = np.append(X_train_app_O3,X_val_app_O3,axis=0)
+y_train_val1 = np.append(y_train_app1,y_val_app1,axis=0)
+y_train_val2 = np.append(y_train_app2,y_val_app2,axis=0)
+y_train_val3 = np.append(y_train_app3,y_val_app3,axis=0)
+
+
 '''
 print(X_train_O3.shape)
 print(X_train_PM.shape)
@@ -327,41 +312,25 @@ X_val_l = X_val_app_PM
 y_val_l = y_val_app1
 
 
-reg = LinearRegression().fit(X_train_l,y_train_l)
-err = mean_squared_error(y_val_l,reg.predict(X_val_l))
+reg = LinearRegression().fit(np.append(X_train_app_O3,X_val_app_O3,axis=0),np.append(y_train_app3,y_val_app3,axis=0))
+err = mean_squared_error(np.append(y_train_app3,y_val_app3,axis=0),reg.predict(np.append(X_train_app_O3,X_val_app_O3,axis=0)))
 
-print("mean squared error : ")
+print("mean absolute error : ")
 print(err)
-pred = reg.predict(X_val_l)
+pred = reg.predict(np.append(X_train_app_O3,X_val_app_O3,axis=0))
 for i in range(10) :
-    print("test : ", y_val_l[i])
+    print("test : ", np.append(y_train_app3,y_val_app3,axis=0)[i])
     print("pred = ", pred[i])
 '''
 print("----------- START TESTS : Gradient Tree Boosting ------------")
-# https://scikit-learn.org/stable/modules/ensemble.html#gradient-boosting
-# https://stackabuse.com/gradient-boosting-classifiers-in-python-with-scikit-learn/
-'''
-ON SEPARERA ON FONCTION PLUS TARD
-'''
-#TO FIT : n_estimators, learning rate, AND max_depth
-'''
-print(X_train.shape)
-X_train_sparse = sparse.csr_matrix(X_train)
-y_train_sparse = sparse.csr_matrix(y_train)
-X_val_sparse = sparse.csr_matrix(X_val)
-y_val_sparse = sparse.csr_matrix(y_val)
-print(X_train_sparse.shape)
-print(y_train_sparse.shape)
-print(X_val_sparse.shape)
-print(y_val_sparse.shape)
-'''
-min_error = 100000000000000000
+
+min_error = -100000000000000000
 '''
 n_est = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50,100,150,200,250,300,350,400,450,500,550,600,750,1000,1250,1500,1750])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1,0.2,0.3,0.4,0.5])
 max_depths = np.array([1,2,3,4,5,6,7,8,9,10])
 '''
-
+'''
 n_est = np.array([50,100,150,200,250,300,350,400])
 learning_rates = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06 ,0.07, 0.08, 0.09, 0.1])
 max_depths = np.array([1,2,3])
@@ -370,13 +339,12 @@ for esti in n_est :
     for lr in learning_rates :
         for depth in max_depths :
             print('esti: ', esti, ' learning_rate : ', lr, ' depth : ', depth)
-            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(X_train_app_O3, y_train_app3)
+            est = GradientBoostingRegressor(n_estimators=esti, learning_rate=lr, max_depth=depth, random_state=0, loss='ls').fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0))
             # make cross validation error
             #error = mean_squared_error(y_val_app3, est.predict(X_val_app_O3))
-
             cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-            n_scores = cross_val_score(est, X_train_app_O3, y_train_app3, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
-            if mean(n_scores) < min_error :
+            n_scores = cross_val_score(est, np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0), scoring='neg_mean_squared_error', cv=cv, n_jobs=-1, error_score='raise')
+            if mean(n_scores) > min_error :
                 min_error = mean(n_scores)
                 best_n_est = esti
                 best_lr = lr
@@ -391,13 +359,13 @@ print("with learning_rate : ")
 print(best_lr)
 print("with max_depth : ")
 print(best_depth)
-est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(X_train_app_O3, y_train_app3)
-pred = est.predict(X_val_app_O3) # CHANGE IN TEST
+est = GradientBoostingRegressor(n_estimators=best_n_est, learning_rate=best_lr, max_depth=best_depth, random_state=0, loss='ls').fit(np.append(X_train_app_PM,X_val_app_PM,axis=0), np.append(y_train_app1,y_val_app1,axis=0))
+pred = est.predict(np.append(X_train_app_PM,X_val_app_PM,axis=0)) # CHANGE IN TEST
 
 for i in range(10) :
-    print("test : ", y_val_app3[i])
+    print("test : ", np.append(y_train_app1,y_val_app1,axis=0)[i])
     print("pred = ", pred[i])
-
+'''
 
 print("----------- END TESTS Gradient Tree Boosting ------------")
 
@@ -466,62 +434,31 @@ print('Should predict : %d' %y_test[1])
 print("----------- END TESTS Random Forest ------------")
 
 print("----------- START TEST : GAM (generalized additive model) ------------")
-# https://medium.com/just-another-data-scientist/building-interpretable-models-with-generalized-additive-models-in-python-c4404eaf5515
-# The common models are LinearGAM, LogisticGAM, PoissonGAM, GammaGAM, InvGuss.
 
-# OMG DES SAUVEURS :
-'''
-Find the best model requires the tuning of several key parameters including
-n_splines, lam, and constraints.
-Among them, lam is of great importance to the performance of GAMs.
-It controls the strength of the regularization penalty on each term.
+print('PM2.5')
+est = LinearGAM(n_splines=10).gridsearch(X_train_val_PM, y_train_val1)
+pred = est.predict(X_train_val_PM)
+error = mean_squared_error(y_train_val1,pred)
+print('mean error : ', error)
+print('real : ', y_train_val1[:20])
+print('pred : ', pred[:20])
 
-yGAM built a grid search function that build a grid to search over multiple lam
-values so that the model with the lowest generalized cross-validation (GCV) score.
+print('PM10')
+est = LinearGAM(n_splines=10).gridsearch(X_train_val_PM, y_train_val2)
+pred = est.predict(X_train_val_PM)
+error = mean_squared_error(y_train_val2,pred)
+print('mean error : ', error)
+print('real : ', y_train_val2[:20])
+print('pred : ', pred[:20])
 
-n_splines refers to the number of splines to use in each of the smooth function that is going to be fitted.
+print('O3')
+est = LinearGAM(n_splines=10).gridsearch(X_train_val_O3, y_train_val3)
+pred = est.predict(X_train_val_O3)
+error = mean_squared_error(y_train_val3,pred)
+print('mean error : ', error)
+print('real : ', y_train_val3[:20])
+print('pred : ', pred[:20])
 
-lam is the penalization term that is multiplied to the second derivative in the overall objective function.
-
-constraints is a list of constraints that allows the user to specify whether a
-function should have a monotonically constraint. This needs to be a string
-in [‘convex’, ‘concave’, ‘monotonic_inc’, ‘monotonic_dec’,’circular’, ‘none’]
-'''
-'''
-# set model : OVER CONSTRAINT, LAM, SPLINES
-gam = LinearGAM(n_splines=10).gridsearch(X_train_app, y_train_app1)
-#gam = LogisticGAM(constraints=constraints, lam=lam, n_splines=n_splines).fit(X, y)
-#gam.summary()
-
-#prediction :
-predictions = gam.predict(X_val_app)
-print("Mean squared error: {} over {} samples".format(mean_squared_error(y_val_app1, predictions), y_val_app1.shape[0]))
-
-print("y test : ")
-print(y_val_app1)
-print("predictions : ")
-
-print(predictions)
-'''
-
-#y_test=y_test.astype('int')
-#predictions=predictions.astype('int')
-#print("Log Loss: {} ".format(log_loss(y_test, predictions)))
-
-'''
-XX = gam.generate_X_grid(term=1)
-plt.rcParams['figure.figsize'] = (28, 8)
-fig, axs = plt.subplots(1, len(boston.feature_names[0:6]))
-titles = boston.feature_names
-for i, ax in enumerate(axs):
-    #pdep, confi = gam.partial_dependence(XX, feature=i+1, width=.95)
-    pdep, confi = gam.partial_dependence(XX, width=.95)
-    ax.plot(XX[:, i], pdep)
-    ax.plot(XX[:, i], confi[0][:, 0], c='grey', ls='--')
-    ax.plot(XX[:, i], confi[0][:, 1], c='grey', ls='--')
-    ax.set_title(titles[i],fontsize=26)
-plt.show()
-'''
 
 print("----------- END TESTS GAM ------------")
 
